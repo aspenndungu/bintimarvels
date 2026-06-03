@@ -12,6 +12,7 @@ export interface MremboProduct {
   badge?: string;
   description: string;
   isPopular?: boolean;
+  imageSrc: string;
 }
 
 export interface ComplianceChecklistItem {

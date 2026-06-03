@@ -9,6 +9,7 @@ export const MREMBO_PRODUCTS: MremboProduct[] = [
     priceKsh: 500,
     badge: 'Starter',
     description: 'Perfect for small households or trying Mrembo for the first time. Comes with lightweight, leak-proof confidence.',
+    imageSrc: '/bundle_6.png'
   },
   {
     id: 'mrembo-12',
@@ -19,6 +20,7 @@ export const MREMBO_PRODUCTS: MremboProduct[] = [
     badge: 'Most Popular',
     description: 'Our overall best-seller. Designed for 2-3 months of uninterrupted peace, keeping your days fully on track.',
     isPopular: true,
+    imageSrc: '/bundle_12.png'
   },
   {
     id: 'mrembo-24',
@@ -28,6 +30,7 @@ export const MREMBO_PRODUCTS: MremboProduct[] = [
     priceKsh: 1550,
     badge: 'Best Value',
     description: 'Ideal for complete confidence. Fully stock up and support your routines, or share premium care with a loved one.',
+    imageSrc: '/bundle_24.png'
   },
   {
     id: 'mrembo-48',
@@ -37,6 +40,7 @@ export const MREMBO_PRODUCTS: MremboProduct[] = [
     priceKsh: 2650,
     badge: 'Super Saver',
     description: 'Maximum savings box. Excellent for salons, resellers, or large families who commit to self-care without worry.',
+    imageSrc: '/bundle_48.png'
   }
 ];
 
