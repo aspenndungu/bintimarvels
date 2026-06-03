@@ -1,0 +1,6 @@
+{
+  "name": "Binti Marvels & Mrembo Pads",
+  "description": "High-fidelity, mobile-first sales and compliance website for Mrembo Pads and Binti Marvels Ltd.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
