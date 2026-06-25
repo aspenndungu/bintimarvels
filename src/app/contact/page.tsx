@@ -84,10 +84,6 @@ export default function Page() {
               <dd className="text-brand-dark-light">BINTI MARVELS LIMITED</dd>
             </div>
             <div>
-              <dt className="font-bold text-brand-dark">Business type</dt>
-              <dd className="text-brand-dark-light">Private Limited Company</dd>
-            </div>
-            <div>
               <dt className="font-bold text-brand-dark">Date of incorporation</dt>
               <dd className="text-brand-dark-light">17 May 2021</dd>
             </div>

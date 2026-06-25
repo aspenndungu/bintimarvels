@@ -6,7 +6,7 @@ export default function Page() {
       <h1 className="font-display font-black text-4xl text-brand-dark mb-8">Privacy Policy</h1>
       <div className="bg-white rounded-2xl p-8 border border-brand-clay shadow-sm space-y-6 text-brand-dark-light text-sm leading-relaxed">
         <p>At BINTI MARVELS LIMITED, we respect your privacy. This policy explains how we collect and use your data when you visit bintimarvels.com.</p>
-        <p><strong className="text-brand-dark">Legal business:</strong> BINTI MARVELS LIMITED, a Private Limited Company in Kenya. Registered business address: CIATA MALL, KIAMBU ROAD, P.O. BOX 35316-00200, KIAMBU, KENYA.</p>
+        <p><strong className="text-brand-dark">Legal business:</strong> BINTI MARVELS LIMITED, registered in Kenya. Registered business address: CIATA MALL, KIAMBU ROAD, P.O. BOX 35316-00200, KIAMBU, KENYA.</p>
         <h2 className="text-lg font-bold text-brand-dark mt-6">What We Collect</h2>
         <p>We only collect data necessary to fulfill your order or request: Name, Phone/WhatsApp Number, Delivery Address, and specific order preferences.</p>
         <h2 className="text-lg font-bold text-brand-dark mt-6">How We Use It</h2>
