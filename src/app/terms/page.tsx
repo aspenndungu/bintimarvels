@@ -6,7 +6,7 @@ export default function Page() {
       <h1 className="font-display font-black text-4xl text-brand-dark mb-8">Terms of Service</h1>
       <div className="bg-white rounded-2xl p-8 border border-brand-clay shadow-sm space-y-6 text-brand-dark-light text-sm leading-relaxed">
         <p>Welcome to BINTI MARVELS LIMITED. By using our website and purchasing our products, you agree to these terms.</p>
-        <p><strong className="text-brand-dark">Legal business:</strong> BINTI MARVELS LIMITED, a Private Limited Company incorporated in Kenya on 17 May 2021 under company registration number PVT-9XUG2P6D. Registered business address: CIATA MALL, KIAMBU ROAD, P.O. BOX 35316-00200, KIAMBU, KENYA. Email: binticreationsllc@gmail.com.</p>
+        <p><strong className="text-brand-dark">Legal business:</strong> BINTI MARVELS LIMITED, a Private Limited Company in Kenya. Registered business address: CIATA MALL, KIAMBU ROAD, P.O. BOX 35316-00200, KIAMBU, KENYA. Email: binticreationsllc@gmail.com.</p>
         <h2 className="text-lg font-bold text-brand-dark mt-6">Product Use & Medical Disclaimer</h2>
         <p>Mrembo Pads are designed for everyday comfort and menstrual hygiene. They are not intended to cure or prevent any medical condition. Please discontinue use if irritation occurs.</p>
         <h2 className="text-lg font-bold text-brand-dark mt-6">Purchasing & Resale</h2>

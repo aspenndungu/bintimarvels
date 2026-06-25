@@ -88,10 +88,6 @@ export default function Page() {
               <dd className="text-brand-dark-light">Private Limited Company</dd>
             </div>
             <div>
-              <dt className="font-bold text-brand-dark">Company registration number</dt>
-              <dd className="text-brand-dark-light">PVT-9XUG2P6D</dd>
-            </div>
-            <div>
               <dt className="font-bold text-brand-dark">Date of incorporation</dt>
               <dd className="text-brand-dark-light">17 May 2021</dd>
             </div>
