@@ -5,7 +5,8 @@ export default function Page() {
     <div className="max-w-3xl mx-auto px-4 py-24 min-h-screen">
       <h1 className="font-display font-black text-4xl text-brand-dark mb-8">Privacy Policy</h1>
       <div className="bg-white rounded-2xl p-8 border border-brand-clay shadow-sm space-y-6 text-brand-dark-light text-sm leading-relaxed">
-        <p>At Binti Marvels Ltd, we respect your privacy. This policy explains how we collect and use your data when you visit bintimarvels.com.</p>
+        <p>At BINTI MARVELS LIMITED, we respect your privacy. This policy explains how we collect and use your data when you visit bintimarvels.com.</p>
+        <p><strong className="text-brand-dark">Legal business:</strong> BINTI MARVELS LIMITED, Private Limited Company registered in Kenya under company registration number PVT-9XUG2P6D. Registered business address: CIATA MALL, KIAMBU ROAD, P.O. BOX 35316-00200, KIAMBU, KENYA.</p>
         <h2 className="text-lg font-bold text-brand-dark mt-6">What We Collect</h2>
         <p>We only collect data necessary to fulfill your order or request: Name, Phone/WhatsApp Number, Delivery Address, and specific order preferences.</p>
         <h2 className="text-lg font-bold text-brand-dark mt-6">How We Use It</h2>
@@ -14,7 +15,7 @@ export default function Page() {
         <p>We share your data only with trusted partners necessary for service delivery, such as delivery riders and our WhatsApp Business provider. We do not sell your data to advertising brokers.</p>
         <h2 className="text-lg font-bold text-brand-dark mt-6">Your Rights (ODPC Compliance)</h2>
         <p>Under the Kenya Data Protection Act, you have the right to access, correct, or delete your personal data. You can also withdraw consent at any time.</p>
-        <p>Contact us at <a href="mailto:privacy@bintimarvels.com" className="text-brand-berry font-bold hover:underline">privacy@bintimarvels.com</a> for any data requests.</p>
+        <p>Contact us at <a href="mailto:binticreationsllc@gmail.com" className="text-brand-berry font-bold hover:underline">binticreationsllc@gmail.com</a> for any data requests.</p>
       </div>
     </div>
   );

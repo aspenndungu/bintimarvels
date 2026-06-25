@@ -11,13 +11,13 @@ export default function Footer() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 grid grid-cols-1 md:grid-cols-4 gap-12">
           
           <div className="space-y-4">
-            <h4 className="font-display font-bold text-xl">Binti Marvels Ltd</h4>
+            <h4 className="font-display font-bold text-xl">BINTI MARVELS LIMITED</h4>
             <p className="text-sm text-brand-clay-dark leading-relaxed">
               Premium African period care. Comfort for the woman who keeps showing up.
             </p>
             <div className="pt-2 text-xs text-brand-clay-dark space-y-1">
               <p>📍 Serving all 47 Kenyan counties</p>
-              <p>✉️ binti@bintimarvels.com</p>
+              <p>✉️ binticreationsllc@gmail.com</p>
               <p>📞 +254 717 345 841</p>
             </div>
           </div>
@@ -58,9 +58,9 @@ export default function Footer() {
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 mt-16 pt-8 border-t border-white/10 text-xs text-brand-clay-dark flex flex-col md:flex-row justify-between items-center gap-4">
-          <p>© {new Date().getFullYear()} Binti Marvels Ltd. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} BINTI MARVELS LIMITED. All rights reserved.</p>
           <div className="flex gap-4">
-            <span>ODPC Data Protection Compliant</span>
+            <span>Kenya data protection rights supported</span>
             <span>Made in Kenya 🇰🇪</span>
           </div>
         </div>
@@ -72,7 +72,7 @@ export default function Footer() {
             <div className="flex-1">
               <h4 className="font-display font-bold text-[#22140F] mb-1">Your Privacy & Consent</h4>
               <p className="text-xs text-[#3D2921] leading-relaxed">
-                Binti Marvels uses cookies to ensure our checkout works, improve delivery routing, and measure social media campaigns. 
+                BINTI MARVELS LIMITED uses cookies to ensure our checkout works, improve delivery routing, and measure social media campaigns. 
                 We process personal data securely in Kenya. Read our <Link href="/privacy" className="underline text-brand-berry">Privacy Policy</Link>.
               </p>
             </div>

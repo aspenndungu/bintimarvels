@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { useCart } from '@/components/CartContext';
 
 export default function CheckoutPage() {
@@ -44,7 +45,7 @@ export default function CheckoutPage() {
                   <div className="h-12 w-12 rounded-full bg-emerald-100 text-brand-teal flex items-center justify-center mx-auto text-xl font-bold">✓</div>
                   <h3 className="font-display font-bold text-brand-dark text-xl">Mrembo Order Successfully Received!</h3>
                   <p className="text-xs text-brand-dark-light max-w-sm mx-auto leading-relaxed">
-                    We've received your order! Our team is preparing your package and will contact you shortly to confirm delivery.
+                    We&apos;ve received your order! Our team is preparing your package and will contact you shortly to confirm delivery.
                   </p>
 
                   <div className="p-4 bg-[#FAF7F2] rounded-xl border border-brand-clay text-left space-y-2">
@@ -58,12 +59,12 @@ export default function CheckoutPage() {
                     </div>
                   </div>
 
-                  <a
+                  <Link
                     href="/"
                     className="inline-block px-6 py-2.5 bg-brand-berry hover:bg-brand-berry-dark text-white rounded-xl text-xs font-display font-semibold uppercase cursor-pointer"
                   >
                     Continue Browsing
-                  </a>
+                  </Link>
                 </div>
               ) : cart.length === 0 ? (
                 <div className="text-center py-12 space-y-4">
@@ -71,12 +72,12 @@ export default function CheckoutPage() {
                   <p className="text-xs text-brand-dark-light max-w-sm mx-auto">
                     Add some Mrembo bundles to your cart before proceeding to checkout.
                   </p>
-                  <a
+                  <Link
                     href="/#mrembo-range"
                     className="inline-block px-6 py-2.5 bg-brand-berry hover:bg-brand-berry-dark text-white rounded-xl text-xs font-display font-semibold uppercase cursor-pointer"
                   >
                     Shop Mrembo Packs
-                  </a>
+                  </Link>
                 </div>
               ) : (
                 <form onSubmit={handleCheckoutSubmit} className="space-y-4 text-xs font-semibold">

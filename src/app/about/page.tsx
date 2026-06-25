@@ -37,17 +37,17 @@ export default function AboutPage() {
               </div>
 
               <h2 className="font-serif font-semibold text-3xl sm:text-4xl text-brand-dark leading-none">
-                "Dignity is a right, not a luxury. We support women who keep showing up."
+                &ldquo;Dignity is a right, not a luxury. We support women who keep showing up.&rdquo;
               </h2>
 
               <p className="text-brand-dark-light text-sm sm:text-base leading-relaxed font-sans">
-                Binti Marvels Ltd was born from the conviction that menstruating should never hold a woman back or force a girl to stay home from school. As a proudly women-led Kenyan manufacturer, we oversee our quality lines directly. We employ local women, pay living wages, and distribute clean, certified sanitary pads that match international quality standards.
+                BINTI MARVELS LIMITED was born from the conviction that menstruating should never hold a woman back or force a girl to stay home from school. As a proudly women-led Kenyan manufacturer, we oversee our quality lines directly. We employ local women, pay living wages, and distribute clean sanitary pads for everyday menstrual care.
               </p>
 
               <div className="p-5 bg-white border border-brand-clay rounded-xl space-y-3 shadow-2xs">
                 <h4 className="font-display font-semibold text-xs text-brand-dark">Local Manufacturing Guarantee:</h4>
                 <p className="text-[11px] text-brand-dark-light leading-relaxed italic">
-                  "Our warehouse stock is produced, stored, and loaded under strict sanitary protocols in Kenya. We maintain enough physical bulk units year-round to fulfill high-volume supermarket distribution grids and global donor school campaigns instantly."
+                  &ldquo;Our warehouse stock is produced, stored, and loaded under strict sanitary protocols in Kenya. We prepare stock for retail, wholesale, and dignity-distribution partners across Kenya.&rdquo;
                 </p>
                 <div className="relative pt-3 border-t border-brand-cream-dark flex flex-col sm:flex-row items-start sm:items-center gap-3">
                   <div className="w-20 h-14 rounded-lg overflow-hidden border border-brand-clay shrink-0 bg-zinc-100 relative">

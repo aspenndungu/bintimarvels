@@ -314,7 +314,7 @@ export default function MremboLandingPage() {
             <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono bg-brand-clay text-brand-dark font-medium uppercase tracking-wider inline-block">
               Two Life Stages, One Sanctity Campaign
             </span>
-            <h3 className="font-serif font-bold text-brand-dark text-xl leading-snug">Did you know? "Binti is the girl. Mrembo is the woman she becomes."</h3>
+            <h3 className="font-serif font-bold text-brand-dark text-xl leading-snug">Did you know? &ldquo;Binti is the girl. Mrembo is the woman she becomes.&rdquo;</h3>
             <p className="text-xs text-brand-dark-light leading-relaxed">
               We also stock Binti Panty Liners and lightweight Binti regular school pad packs. Specifically designed with gentle fabrics for younger girls entering their cycles.
             </p>
@@ -332,7 +332,7 @@ export default function MremboLandingPage() {
         <div className="mt-16 bg-white rounded-2xl border border-brand-clay p-8">
           <div className="text-center mb-8">
             <h3 className="font-display font-bold text-2xl text-brand-dark">How to Order</h3>
-            <p className="text-xs text-brand-dark-light mt-2 italic">We'll only message you about this order unless you opt in to more.</p>
+            <p className="text-xs text-brand-dark-light mt-2 italic">We&apos;ll only message you about this order unless you opt in to more.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 relative">
             <div className="flex flex-col items-center text-center space-y-3">

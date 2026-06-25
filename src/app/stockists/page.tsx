@@ -30,7 +30,7 @@ export default function StockistsPage() {
             <span className="text-brand-berry text-xs font-mono uppercase font-bold tracking-widest block">Wholesale & Partnership Channel</span>
             <h2 className="font-display font-bold text-3xl md:text-4xl text-brand-dark">Stock Mrembo Pads</h2>
             <p className="text-brand-dark-light text-sm leading-relaxed">
-              Become an authorized stockist retailer or distributor partner. Binti Marvels Ltd distributes high-margin boxes to salons, beauty shops, pharmacies, local kiosks, schools, and supermarket chains across East Africa.
+              Become an authorized stockist retailer or distributor partner. BINTI MARVELS LIMITED distributes period-care products to salons, beauty shops, pharmacies, local kiosks, schools, and supermarket chains across East Africa.
             </p>
 
             <div className="space-y-4 pt-4">
