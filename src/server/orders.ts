@@ -57,8 +57,7 @@ export async function createPendingOrder(input: CheckoutInput): Promise<PendingO
       SELECT id, public_reference, status, subtotal_ksh, delivery_fee_ksh, total_ksh, customer_phone, request_fingerprint
       FROM website_orders WHERE idempotency_key = ${input.idempotencyKey} LIMIT 1`;
     if (existing[0]) {
-      if (existing[0].request_fingerprint && existing[0].request_fingerprint !== requestFingerprint) throw new IdempotencyConflictError();
-      if (!existing[0].request_fingerprint && (existing[0].total_ksh !== totals.totalKsh || existing[0].customer_phone !== phone)) throw new IdempotencyConflictError();
+      if (!existing[0].request_fingerprint || existing[0].request_fingerprint !== requestFingerprint) throw new IdempotencyConflictError();
       return {
         id: existing[0].id, publicReference: existing[0].public_reference, status: existing[0].status,
         subtotalKsh: existing[0].subtotal_ksh, deliveryFeeKsh: existing[0].delivery_fee_ksh,

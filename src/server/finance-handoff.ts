@@ -1,9 +1,12 @@
 import { createHmac } from 'node:crypto';
+import { request as httpsRequest } from 'node:https';
 import { lookup } from 'node:dns/promises';
 import { isIP } from 'node:net';
 import { database } from './db';
+import { isApprovedPublicHttpsUrl, isPrivateNetworkAddress } from '@/lib/network-security';
 
 interface RetailHandoffRow {
+  handoff_id: string;
   website_order_id: string;
   public_reference: string;
   customer_name: string;
@@ -27,6 +30,7 @@ interface RetailHandoffRow {
   created_at: Date | string;
   paid_at: Date | string | null;
   order_status: string;
+  event_status: string;
   provider: string;
   provider_confirmation_code: string | null;
   provider_payment_method: string | null;
@@ -36,6 +40,7 @@ interface RetailHandoffRow {
 }
 
 interface SchoolSupportHandoffRow {
+  handoff_id: string;
   id: string;
   public_reference: string;
   project_code: string;
@@ -51,6 +56,7 @@ interface SchoolSupportHandoffRow {
   created_at: Date | string;
   completed_at: Date | string | null;
   status: string;
+  event_status: string;
   event_type: string;
 }
 
@@ -58,36 +64,17 @@ export function financeSignature(payload: string, secret: string) {
   return createHmac('sha256', secret).update(payload).digest('hex');
 }
 
-export function isPrivateNetworkAddress(address: string) {
-  const value = address.toLowerCase().replace(/^\[|\]$/g, '');
-  if (value.startsWith('::ffff:')) return isPrivateNetworkAddress(value.slice(7));
-  if (isIP(value) === 4) {
-    const [a, b] = value.split('.').map(Number);
-    return a === 0 || a === 10 || a === 127 || a! >= 224
-      || (a === 100 && b! >= 64 && b! <= 127)
-      || (a === 169 && b === 254)
-      || (a === 172 && b! >= 16 && b! <= 31)
-      || (a === 192 && (b === 0 || b === 168))
-      || (a === 198 && (b === 18 || b === 19 || b === 51))
-      || (a === 203 && b === 0);
-  }
-  if (isIP(value) === 6) {
-    return value === '::' || value === '::1' || /^f[cd]/.test(value)
-      || /^fe[89ab]/.test(value) || value.startsWith('ff') || value.startsWith('2001:db8');
-  }
-  return false;
-}
-
 async function assertPublicFinanceDestination(endpoint: URL) {
   const hostname = endpoint.hostname.replace(/^\[|\]$/g, '').toLowerCase();
   if (hostname === 'localhost' || hostname.endsWith('.local') || isPrivateNetworkAddress(hostname)) {
     throw new Error('Finance webhook destination cannot use a private or reserved network address.');
   }
-  if (isIP(hostname) || process.env.NODE_ENV === 'test') return;
+  if (isIP(hostname) || process.env.NODE_ENV === 'test') return [hostname];
   const addresses = await lookup(hostname, { all: true, verbatim: true });
   if (!addresses.length || addresses.some((entry) => isPrivateNetworkAddress(entry.address))) {
     throw new Error('Finance webhook destination resolved to a private or reserved network address.');
   }
+  return addresses.map((entry) => entry.address);
 }
 
 function financeConfig() {
@@ -97,67 +84,104 @@ function financeConfig() {
     .split(',').map((item) => item.trim().toLowerCase()).filter(Boolean);
   if (!rawUrl || !secret || !allowed.length) return null;
   const endpoint = new URL(rawUrl);
-  if (endpoint.protocol !== 'https:' || endpoint.username || endpoint.password || endpoint.search || endpoint.hash
-    || !allowed.includes(endpoint.host.toLowerCase())
-    || endpoint.hostname.toLowerCase() === 'localhost'
-    || endpoint.hostname.toLowerCase().endsWith('.local')
-    || isPrivateNetworkAddress(endpoint.hostname)) {
+  if (!isApprovedPublicHttpsUrl(rawUrl, allowed)) {
     throw new Error('Finance webhook destination is not approved.');
   }
   return { endpoint, secret };
+}
+
+async function postPinnedFinancePayload(endpoint: URL, resolvedAddress: string, payload: string, secret: string, idempotencyKey: string) {
+  return await new Promise<{ record_id?: string }>((resolve, reject) => {
+    const request = httpsRequest({
+      hostname: resolvedAddress,
+      port: endpoint.port ? Number(endpoint.port) : 443,
+      path: `${endpoint.pathname}${endpoint.search}`,
+      method: 'POST',
+      servername: endpoint.hostname.replace(/^\[|\]$/g, ''),
+      headers: {
+        Host: endpoint.host,
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(payload),
+        'X-Binti-Signature': `sha256=${financeSignature(payload, secret)}`,
+        'Idempotency-Key': idempotencyKey,
+      },
+      timeout: 15_000,
+    }, (response) => {
+      let body = '';
+      response.setEncoding('utf8');
+      response.on('data', (chunk) => { body += chunk; });
+      response.on('end', () => {
+        if ((response.statusCode ?? 500) < 200 || (response.statusCode ?? 500) >= 300) {
+          reject(new Error(`Finance receiver returned HTTP ${response.statusCode ?? 500}.`));
+          return;
+        }
+        try { resolve(JSON.parse(body || '{}') as { record_id?: string }); }
+        catch { resolve({}); }
+      });
+    });
+    request.on('timeout', () => request.destroy(new Error('Finance receiver timed out.')));
+    request.on('error', reject);
+    request.end(payload);
+  });
 }
 
 async function postFinancePayload(payloadObject: unknown, idempotencyKey: string) {
   const config = financeConfig();
   if (!config) return null;
   const payload = JSON.stringify(payloadObject);
-  await assertPublicFinanceDestination(config.endpoint);
-  const response = await fetch(config.endpoint, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Binti-Signature': `sha256=${financeSignature(payload, config.secret)}`,
-      'Idempotency-Key': idempotencyKey,
-    },
-    body: payload,
-    cache: 'no-store',
-    redirect: 'manual',
-    signal: AbortSignal.timeout(15_000),
-  });
-  if (!response.ok) throw new Error(`Finance receiver returned HTTP ${response.status}.`);
-  return await response.json().catch(() => ({})) as { record_id?: string };
+  const resolvedAddresses = await assertPublicFinanceDestination(config.endpoint);
+  if (process.env.NODE_ENV === 'test') {
+    const response = await fetch(config.endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Binti-Signature': `sha256=${financeSignature(payload, config.secret)}`,
+        'Idempotency-Key': idempotencyKey,
+      },
+      body: payload,
+      cache: 'no-store',
+      redirect: 'manual',
+      signal: AbortSignal.timeout(15_000),
+    });
+    if (!response.ok) throw new Error(`Finance receiver returned HTTP ${response.status}.`);
+    return await response.json().catch(() => ({})) as { record_id?: string };
+  }
+  return postPinnedFinancePayload(config.endpoint, resolvedAddresses[0], payload, config.secret, idempotencyKey);
 }
 
 export async function deliverFinanceHandoff(orderId: string) {
   if (!financeConfig()) return { delivered: false, reason: 'not_configured' as const };
   const sql = database();
-  const [claim] = await sql<{ order_id: string }[]>`
+  const [claim] = await sql<{ id: string; event_type: string }[]>`
     UPDATE website_handoffs SET status = 'in_flight', locked_until = now() + interval '2 minutes', attempts = attempts + 1, updated_at = now()
-    WHERE order_id = ${orderId} AND (status IN ('pending','retry') OR (status = 'in_flight' AND locked_until < now()))
-    RETURNING order_id`;
+    WHERE id = (
+      SELECT id FROM website_handoffs
+      WHERE order_id = ${orderId} AND (status IN ('pending','retry') OR (status = 'in_flight' AND locked_until < now()))
+      ORDER BY created_at ASC, event_type ASC FOR UPDATE SKIP LOCKED LIMIT 1
+    )
+    RETURNING id, event_type`;
   if (!claim) return { delivered: false, reason: 'already_claimed' as const };
 
   try {
     const rows = await sql<RetailHandoffRow[]>`
-      SELECT o.id AS website_order_id, o.public_reference, o.customer_name, o.customer_phone, o.customer_email,
+      SELECT h.id AS handoff_id, o.id AS website_order_id, o.public_reference, o.customer_name, o.customer_phone, o.customer_email,
         o.county, o.delivery_source, o.delivery_address, o.delivery_landmark, o.destination_type,
         o.delivery_latitude, o.delivery_longitude, o.route_distance_meters, o.route_duration_seconds,
         o.route_travel_mode, o.delivery_tariff_version, o.subtotal_ksh, o.delivery_fee_ksh, o.total_ksh,
         o.marketing_consent, o.created_at, o.paid_at, o.status AS order_status,
-        p.provider, p.provider_confirmation_code, p.provider_payment_method, p.provider_masked_account,
-        h.event_type,
+        h.provider, h.provider_confirmation_code, h.provider_payment_method, h.provider_masked_account,
+        h.event_type, h.event_status,
         json_agg(json_build_object('product_id', i.product_id, 'product_name', i.product_name,
           'quantity', i.quantity, 'unit_price_ksh', i.unit_price_ksh, 'line_total_ksh', i.line_total_ksh)
           ORDER BY i.id) AS items
       FROM website_orders o
-      JOIN website_payments p ON p.order_id = o.id
       JOIN website_order_items i ON i.order_id = o.id
       JOIN website_handoffs h ON h.order_id = o.id
-      WHERE o.id = ${orderId} AND o.status IN ('paid','payment_review','refund_or_reversal_review')
-      GROUP BY o.id, p.provider, p.provider_confirmation_code, p.provider_payment_method, p.provider_masked_account, h.event_type`;
+      WHERE h.id = ${claim.id}
+      GROUP BY o.id, h.id`;
     if (!rows[0]) throw new Error('Verified order not found for finance handoff.');
     const row = rows[0];
-    const isPaid = row.order_status === 'paid';
+    const isPaid = row.event_type === 'website.order.paid';
     const handoffKey = `${row.event_type}:${orderId}`;
     const body = await postFinancePayload({
       event: row.event_type,
@@ -170,7 +194,7 @@ export async function deliverFinanceHandoff(orderId: string) {
       requires_review: !isPaid,
       website_order_id: row.website_order_id,
       public_reference: row.public_reference,
-      order_status: row.order_status,
+      order_status: row.event_status,
       customer: { name: row.customer_name, phone: row.customer_phone, email: row.customer_email || null },
       delivery: {
         county: row.county, source: row.delivery_source, address: row.delivery_address,
@@ -197,12 +221,12 @@ export async function deliverFinanceHandoff(orderId: string) {
     if (!body) throw new Error('Finance handoff is not configured.');
     await sql`UPDATE website_handoffs SET status = 'delivered', locked_until = NULL,
       external_record_id = ${body.record_id?.slice(0, 200) ?? null}, last_error = NULL, updated_at = now()
-      WHERE order_id = ${orderId} AND status = 'in_flight'`;
-    return { delivered: true, recordId: body.record_id ?? null };
+      WHERE id = ${claim.id} AND status = 'in_flight'`;
+    return { delivered: true, recordId: body.record_id ?? null, eventType: row.event_type };
   } catch (error) {
     await sql`UPDATE website_handoffs SET status = 'retry', locked_until = NULL,
       last_error = ${(error instanceof Error ? error.message : 'Finance handoff failed').slice(0, 300)}, updated_at = now()
-      WHERE order_id = ${orderId} AND status = 'in_flight'`;
+      WHERE id = ${claim.id} AND status = 'in_flight'`;
     throw error;
   }
 }
@@ -210,21 +234,29 @@ export async function deliverFinanceHandoff(orderId: string) {
 export async function deliverSchoolSupportFinanceHandoff(supportId: string) {
   if (!financeConfig()) return { delivered: false, reason: 'not_configured' as const };
   const sql = database();
-  const [claim] = await sql<{ support_id: string }[]>`
+  const [claim] = await sql<{ id: string; event_type: string }[]>`
     UPDATE website_support_handoffs SET status = 'in_flight', locked_until = now() + interval '2 minutes', attempts = attempts + 1, updated_at = now()
-    WHERE support_id = ${supportId} AND (status IN ('pending','retry') OR (status = 'in_flight' AND locked_until < now()))
-    RETURNING support_id`;
+    WHERE id = (
+      SELECT id FROM website_support_handoffs
+      WHERE support_id = ${supportId} AND (status IN ('pending','retry') OR (status = 'in_flight' AND locked_until < now()))
+      ORDER BY created_at ASC, event_type ASC FOR UPDATE SKIP LOCKED LIMIT 1
+    )
+    RETURNING id, event_type`;
   if (!claim) return { delivered: false, reason: 'already_claimed' as const };
 
   try {
     const rows = await sql<SchoolSupportHandoffRow[]>`
-      SELECT s.*, h.event_type FROM website_school_support s
+      SELECT h.id AS handoff_id, s.id, s.public_reference, s.project_code, s.amount_ksh,
+        s.supporter_name, s.supporter_phone, s.supporter_email, s.message, s.created_at, s.completed_at,
+        s.status, h.event_type, h.event_status, h.provider, h.provider_confirmation_code,
+        h.provider_payment_method, h.provider_masked_account
+      FROM website_school_support s
       JOIN website_support_handoffs h ON h.support_id = s.id
-      WHERE s.id = ${supportId} AND s.status IN ('completed','reversed','payment_review')`;
+      WHERE h.id = ${claim.id}`;
     if (!rows[0]) throw new Error('Verified school-support payment not found for finance handoff.');
     const row = rows[0];
     const handoffKey = `${row.event_type}:school-support:${row.id}`;
-    const isCompleted = row.status === 'completed';
+    const isCompleted = row.event_type === 'website.school_support.completed';
     const body = await postFinancePayload({
       event: row.event_type,
       version: 1,
@@ -236,6 +268,7 @@ export async function deliverSchoolSupportFinanceHandoff(supportId: string) {
       requires_review: true,
       website_support_id: row.id,
       public_reference: row.public_reference,
+      support_status: row.event_status,
       project_code: row.project_code,
       amount_ksh: row.amount_ksh,
       supporter: { name: row.supporter_name, phone: row.supporter_phone, email: row.supporter_email || null },
@@ -253,12 +286,12 @@ export async function deliverSchoolSupportFinanceHandoff(supportId: string) {
     if (!body) throw new Error('Finance handoff is not configured.');
     await sql`UPDATE website_support_handoffs SET status = 'delivered', locked_until = NULL,
       external_record_id = ${body.record_id?.slice(0, 200) ?? null}, last_error = NULL, updated_at = now()
-      WHERE support_id = ${supportId} AND status = 'in_flight'`;
-    return { delivered: true, recordId: body.record_id ?? null };
+      WHERE id = ${claim.id} AND status = 'in_flight'`;
+    return { delivered: true, recordId: body.record_id ?? null, eventType: row.event_type };
   } catch (error) {
     await sql`UPDATE website_support_handoffs SET status = 'retry', locked_until = NULL,
       last_error = ${(error instanceof Error ? error.message : 'Finance handoff failed').slice(0, 300)}, updated_at = now()
-      WHERE support_id = ${supportId} AND status = 'in_flight'`;
+      WHERE id = ${claim.id} AND status = 'in_flight'`;
     throw error;
   }
 }

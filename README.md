@@ -48,7 +48,7 @@ Legacy `/about`, `/impact` and `/stockists` redirect to the new journeys.
 5. Pesapal sends an IPN to the secret path and returns the browser through the public callback.
 6. The server does not trust callback query parameters as proof of payment. It calls Pesapal `GetTransactionStatus` and verifies merchant reference, exact KES amount, currency, provider tracking ID and status.
 7. Only a verified `COMPLETED` status can mark an active order paid. A late completion after inventory release becomes `payment_review`, never automatic fulfilment.
-8. A verified school-support completion creates one durable finance handoff for internal review.
+8. Every verified completion, reversal or review state creates its own durable finance lifecycle event; a later event cannot overwrite an earlier undelivered event.
 9. Provider events are replay-safe and stored without credentials or full card/PIN information.
 
 Database migrations, in order:
@@ -56,6 +56,7 @@ Database migrations, in order:
 - `migrations/001_website_commerce.sql`
 - `migrations/002_map_delivery_upgrade.sql`
 - `migrations/003_pesapal_and_school_support.sql`
+- `migrations/004_durable_finance_events.sql`
 
 ## Pesapal setup
 

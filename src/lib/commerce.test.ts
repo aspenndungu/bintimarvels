@@ -61,6 +61,12 @@ describe('payment runtime readiness', () => {
     vi.stubEnv('FINANCE_WEBHOOK_ALLOWED_HOSTS', 'finance.example.com');
     vi.stubEnv('FINANCE_WEBHOOK_URL', 'https://finance.example.com/intake?token=unsafe');
     expect(paymentRuntimeReady()).toBe(false);
+    vi.stubEnv('FINANCE_WEBHOOK_URL', 'https://127.0.0.1/intake');
+    vi.stubEnv('FINANCE_WEBHOOK_ALLOWED_HOSTS', '127.0.0.1');
+    expect(paymentRuntimeReady()).toBe(false);
+    vi.stubEnv('FINANCE_WEBHOOK_URL', 'https://[::ffff:7f00:1]/intake');
+    vi.stubEnv('FINANCE_WEBHOOK_ALLOWED_HOSTS', '[::ffff:7f00:1]');
+    expect(paymentRuntimeReady()).toBe(false);
     vi.unstubAllEnvs();
   });
 });

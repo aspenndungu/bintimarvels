@@ -80,8 +80,8 @@ export async function processPesapalRetailNotification(input: {
     if (status.currency !== 'KES' || status.amountKsh !== payment.expected_amount_ksh) {
       await tx`UPDATE website_orders SET status = 'payment_review', updated_at = now() WHERE id = ${payment.order_id} AND status <> 'paid'`;
       await tx`UPDATE website_payments SET status = 'payment_review', result_description = 'Pesapal amount or currency mismatch', updated_at = now() WHERE order_id = ${payment.order_id}`;
-      await tx`INSERT INTO website_handoffs ${tx({ order_id: payment.order_id, website_order_id: payment.order_id, event_type: 'website.order.payment_review', status: 'pending' })}
-        ON CONFLICT (order_id) DO UPDATE SET event_type = excluded.event_type, status = 'pending', locked_until = NULL, last_error = NULL, updated_at = now()`;
+      await tx`INSERT INTO website_handoffs ${tx({ id: randomUUID(), order_id: payment.order_id, website_order_id: payment.order_id, event_type: 'website.order.payment_review', event_status: 'payment_review', status: 'pending', provider: 'pesapal', provider_confirmation_code: status.confirmationCode, provider_payment_method: status.paymentMethod || null, provider_masked_account: status.maskedPaymentAccount || null })}
+        ON CONFLICT (order_id, event_type) DO NOTHING`;
       return 'payment_review' as const;
     }
 
@@ -98,23 +98,23 @@ export async function processPesapalRetailNotification(input: {
         await tx`UPDATE website_orders SET status = 'payment_review', paid_at = COALESCE(paid_at, now()), updated_at = now() WHERE id = ${payment.order_id}`;
         await tx`UPDATE website_payments SET ${tx({ ...providerFields, status: 'payment_review' })}, updated_at = now() WHERE order_id = ${payment.order_id}`;
         await tx`UPDATE website_inventory_reservations SET released_at = COALESCE(released_at, now()), release_reason = COALESCE(release_reason, 'verified_payment_requires_stock_review') WHERE order_id = ${payment.order_id}`;
-        await tx`INSERT INTO website_handoffs ${tx({ order_id: payment.order_id, website_order_id: payment.order_id, event_type: 'website.order.payment_review', status: 'pending' })}
-          ON CONFLICT (order_id) DO UPDATE SET event_type = excluded.event_type, status = 'pending', locked_until = NULL, last_error = NULL, updated_at = now()`;
+        await tx`INSERT INTO website_handoffs ${tx({ id: randomUUID(), order_id: payment.order_id, website_order_id: payment.order_id, event_type: 'website.order.payment_review', event_status: 'payment_review', status: 'pending', provider: 'pesapal', provider_confirmation_code: status.confirmationCode, provider_payment_method: status.paymentMethod || null, provider_masked_account: status.maskedPaymentAccount || null })}
+          ON CONFLICT (order_id, event_type) DO NOTHING`;
         return 'payment_review' as const;
       }
       await tx`UPDATE website_orders SET status = 'paid', paid_at = COALESCE(paid_at, now()), updated_at = now() WHERE id = ${payment.order_id}`;
       await tx`UPDATE website_payments SET ${tx({ ...providerFields, status: 'paid' })}, updated_at = now() WHERE order_id = ${payment.order_id}`;
       await tx`UPDATE website_inventory_reservations SET released_at = COALESCE(released_at, now()), release_reason = COALESCE(release_reason, 'consumed_by_verified_payment') WHERE order_id = ${payment.order_id}`;
-      await tx`INSERT INTO website_handoffs ${tx({ order_id: payment.order_id, website_order_id: payment.order_id, event_type: 'website.order.paid', status: 'pending' })}
-        ON CONFLICT (order_id) DO UPDATE SET event_type = excluded.event_type, status = 'pending', locked_until = NULL, last_error = NULL, updated_at = now()`;
+      await tx`INSERT INTO website_handoffs ${tx({ id: randomUUID(), order_id: payment.order_id, website_order_id: payment.order_id, event_type: 'website.order.paid', event_status: 'paid', status: 'pending', provider: 'pesapal', provider_confirmation_code: status.confirmationCode, provider_payment_method: status.paymentMethod || null, provider_masked_account: status.maskedPaymentAccount || null })}
+        ON CONFLICT (order_id, event_type) DO NOTHING`;
       return 'paid' as const;
     }
 
     if (status.status === 'REVERSED') {
       await tx`UPDATE website_orders SET status = 'refund_or_reversal_review', updated_at = now() WHERE id = ${payment.order_id}`;
       await tx`UPDATE website_payments SET ${tx({ ...providerFields, status: 'refund_or_reversal_review' })}, updated_at = now() WHERE order_id = ${payment.order_id}`;
-      await tx`INSERT INTO website_handoffs ${tx({ order_id: payment.order_id, website_order_id: payment.order_id, event_type: 'website.order.reversed', status: 'pending' })}
-        ON CONFLICT (order_id) DO UPDATE SET event_type = excluded.event_type, status = 'pending', locked_until = NULL, last_error = NULL, updated_at = now()`;
+      await tx`INSERT INTO website_handoffs ${tx({ id: randomUUID(), order_id: payment.order_id, website_order_id: payment.order_id, event_type: 'website.order.reversed', event_status: 'refund_or_reversal_review', status: 'pending', provider: 'pesapal', provider_confirmation_code: status.confirmationCode, provider_payment_method: status.paymentMethod || null, provider_masked_account: status.maskedPaymentAccount || null })}
+        ON CONFLICT (order_id, event_type) DO NOTHING`;
       return 'reversal_review' as const;
     }
 
@@ -125,8 +125,8 @@ export async function processPesapalRetailNotification(input: {
     if (payment.order_status === 'paid') {
       await tx`UPDATE website_orders SET status = 'payment_review', updated_at = now() WHERE id = ${payment.order_id}`;
       await tx`UPDATE website_payments SET ${tx({ ...providerFields, status: 'payment_review' })}, updated_at = now() WHERE order_id = ${payment.order_id}`;
-      await tx`INSERT INTO website_handoffs ${tx({ order_id: payment.order_id, website_order_id: payment.order_id, event_type: 'website.order.payment_review', status: 'pending' })}
-        ON CONFLICT (order_id) DO UPDATE SET event_type = excluded.event_type, status = 'pending', locked_until = NULL, last_error = NULL, updated_at = now()`;
+      await tx`INSERT INTO website_handoffs ${tx({ id: randomUUID(), order_id: payment.order_id, website_order_id: payment.order_id, event_type: 'website.order.payment_review', event_status: 'payment_review', status: 'pending', provider: 'pesapal', provider_confirmation_code: status.confirmationCode, provider_payment_method: status.paymentMethod || null, provider_masked_account: status.maskedPaymentAccount || null })}
+        ON CONFLICT (order_id, event_type) DO NOTHING`;
       return 'payment_review' as const;
     }
     const reservations = await tx<{ product_id: string; quantity: number }[]>`
@@ -161,8 +161,7 @@ export async function createSchoolSupportPayment(input: SchoolSupportInput, clie
     }[]>`SELECT id, public_reference, status, amount_ksh, provider_tracking_id, provider_redirect_url, request_fingerprint
       FROM website_school_support WHERE idempotency_key = ${input.idempotencyKey} LIMIT 1`;
     if (existing[0]) {
-      if (existing[0].request_fingerprint && existing[0].request_fingerprint !== requestFingerprint) throw new IdempotencyConflictError();
-      if (!existing[0].request_fingerprint && existing[0].amount_ksh !== input.amountKsh) throw new IdempotencyConflictError();
+      if (!existing[0].request_fingerprint || existing[0].request_fingerprint !== requestFingerprint) throw new IdempotencyConflictError();
       return { ...existing[0], created: false };
     }
     const id = randomUUID();
@@ -230,8 +229,8 @@ export async function processPesapalSchoolSupportNotification(input: {
     if (support.provider_tracking_id && support.provider_tracking_id !== input.trackingId) throw new PesapalPaymentMismatchError('Pesapal tracking ID mismatch.');
     if (status.currency !== 'KES' || status.amountKsh !== support.amount_ksh) {
       await tx`UPDATE website_school_support SET status = 'payment_review', provider_tracking_id = COALESCE(provider_tracking_id, ${input.trackingId}), updated_at = now() WHERE id = ${support.id}`;
-      await tx`INSERT INTO website_support_handoffs ${tx({ support_id: support.id, event_type: 'website.school_support.payment_review', status: 'pending' })}
-        ON CONFLICT (support_id) DO UPDATE SET event_type = excluded.event_type, status = 'pending', locked_until = NULL, last_error = NULL, updated_at = now()`;
+      await tx`INSERT INTO website_support_handoffs ${tx({ id: randomUUID(), support_id: support.id, event_type: 'website.school_support.payment_review', event_status: 'payment_review', status: 'pending', provider: 'pesapal', provider_confirmation_code: status.confirmationCode, provider_payment_method: status.paymentMethod || null, provider_masked_account: status.maskedPaymentAccount || null })}
+        ON CONFLICT (support_id, event_type) DO NOTHING`;
       return 'payment_review' as const;
     }
     const fields = {
@@ -243,8 +242,8 @@ export async function processPesapalSchoolSupportNotification(input: {
     if (status.status === 'COMPLETED') {
       if (support.status === 'completed') return 'duplicate' as const;
       await tx`UPDATE website_school_support SET ${tx({ ...fields, status: 'completed' })}, completed_at = COALESCE(completed_at, now()), updated_at = now() WHERE id = ${support.id}`;
-      await tx`INSERT INTO website_support_handoffs ${tx({ support_id: support.id, event_type: 'website.school_support.completed', status: 'pending' })}
-        ON CONFLICT (support_id) DO UPDATE SET event_type = excluded.event_type, status = 'pending', locked_until = NULL, last_error = NULL, updated_at = now()`;
+      await tx`INSERT INTO website_support_handoffs ${tx({ id: randomUUID(), support_id: support.id, event_type: 'website.school_support.completed', event_status: 'completed', status: 'pending', provider: 'pesapal', provider_confirmation_code: status.confirmationCode, provider_payment_method: status.paymentMethod || null, provider_masked_account: status.maskedPaymentAccount || null })}
+        ON CONFLICT (support_id, event_type) DO NOTHING`;
       return 'completed' as const;
     }
     if (status.status === 'INVALID') return support.status === 'completed' ? 'duplicate' as const : 'pending' as const;
@@ -252,8 +251,8 @@ export async function processPesapalSchoolSupportNotification(input: {
     await tx`UPDATE website_school_support SET ${tx({ ...fields, status: nextStatus })}, updated_at = now() WHERE id = ${support.id}`;
     if (nextStatus === 'reversed' || nextStatus === 'payment_review') {
       const eventType = nextStatus === 'reversed' ? 'website.school_support.reversed' : 'website.school_support.payment_review';
-      await tx`INSERT INTO website_support_handoffs ${tx({ support_id: support.id, event_type: eventType, status: 'pending' })}
-        ON CONFLICT (support_id) DO UPDATE SET event_type = excluded.event_type, status = 'pending', locked_until = NULL, last_error = NULL, updated_at = now()`;
+      await tx`INSERT INTO website_support_handoffs ${tx({ id: randomUUID(), support_id: support.id, event_type: eventType, event_status: nextStatus, status: 'pending', provider: 'pesapal', provider_confirmation_code: status.confirmationCode, provider_payment_method: status.paymentMethod || null, provider_masked_account: status.maskedPaymentAccount || null })}
+        ON CONFLICT (support_id, event_type) DO NOTHING`;
     }
     return nextStatus;
   });

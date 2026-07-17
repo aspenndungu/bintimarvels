@@ -27,11 +27,11 @@ const accepted = (tracking = randomUUID()) => ({
     merchantReference, orderTrackingId: tracking, redirectUrl: `https://cybqa.pesapal.com/payment/${tracking}`,
   })),
 }) as never;
-const providerStatus = (merchantReference: string, amountKsh: number, status: 'COMPLETED' | 'REVERSED' | 'FAILED') => ({
+const providerStatus = (merchantReference: string, amountKsh: number, status: 'COMPLETED' | 'REVERSED' | 'FAILED', confirmationCode = `CONF-${randomUUID()}`) => ({
   getTransactionStatus: vi.fn().mockResolvedValue({
     status, statusCode: status === 'COMPLETED' ? 1 : status === 'REVERSED' ? 2 : 3,
     amountKsh, currency: 'KES', merchantReference,
-    paymentMethod: 'M-PESA', confirmationCode: `CONF-${randomUUID()}`,
+    paymentMethod: 'M-PESA', confirmationCode,
     description: status, maskedPaymentAccount: '2547***678',
   }),
 }) as never;
@@ -68,6 +68,18 @@ suite('PostgreSQL Pesapal order ledger', () => {
     expect((pesapal as { submitOrder: ReturnType<typeof vi.fn> }).submitOrder).toHaveBeenCalledTimes(1);
     const [inventory] = await database()<{ available_units: number }[]>`SELECT available_units FROM website_inventory WHERE product_id = 'mrembo-6'`;
     expect(inventory.available_units).toBe(8);
+  });
+
+  it('fails closed when a legacy retail idempotency row has no request fingerprint', async () => {
+    const checkout = input();
+    const pesapal = accepted();
+    const order = await startCheckout(checkout, pesapal);
+    await database()`UPDATE website_orders SET request_fingerprint = NULL WHERE id = ${order.id}`;
+    await expect(startCheckout({
+      ...checkout,
+      customer: { ...checkout.customer, fullName: 'Changed legacy customer' },
+    }, pesapal)).rejects.toThrow(/idempotency key/i);
+    expect((pesapal as { submitOrder: ReturnType<typeof vi.fn> }).submitOrder).toHaveBeenCalledTimes(1);
   });
 
   it('does not let submit-order persistence downgrade a callback-completed retail payment', async () => {
@@ -129,23 +141,28 @@ suite('PostgreSQL Pesapal order ledger', () => {
     expect(results.filter((result) => result.delivered)).toHaveLength(1);
   });
 
-  it('delivers a verified retail reversal as a separate non-sale finance event', async () => {
+  it('durably delivers both retail completion and reversal exactly once when both are queued', async () => {
     const order = await startCheckout(input(), accepted());
     const notification = {
       trackingId: order.orderTrackingId!, merchantReference: order.publicReference,
       notificationType: 'IPNCHANGE', raw: { redacted: true },
     };
-    await processPesapalRetailNotification(notification, completed(order.publicReference, order.totalKsh));
-    expect((await processPesapalRetailNotification(notification, providerStatus(order.publicReference, order.totalKsh, 'REVERSED'))).outcome).toBe('reversal_review');
+    await processPesapalRetailNotification(notification, providerStatus(order.publicReference, order.totalKsh, 'COMPLETED', 'PAID-CODE'));
+    expect((await processPesapalRetailNotification(notification, providerStatus(order.publicReference, order.totalKsh, 'REVERSED', 'REVERSAL-CODE'))).outcome).toBe('reversal_review');
+    const queued = await database()<{ event_type: string }[]>`SELECT event_type FROM website_handoffs WHERE order_id = ${order.id} ORDER BY created_at, event_type`;
+    expect(queued.map((row) => row.event_type)).toEqual(['website.order.paid', 'website.order.reversed']);
+
     process.env.FINANCE_WEBHOOK_URL = 'https://finance.example.test/intake';
     process.env.FINANCE_WEBHOOK_ALLOWED_HOSTS = 'finance.example.test';
     process.env.FINANCE_WEBHOOK_SECRET = 'test-only-finance-handoff-secret-32';
-    const fetcher = vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(JSON.stringify({ record_id: 'reversal-one' }), { status: 200 }));
-    await expect(deliverFinanceHandoff(order.id)).resolves.toMatchObject({ delivered: true });
-    const payload = JSON.parse(String(fetcher.mock.calls[0][1]?.body));
-    expect(payload).toMatchObject({ event: 'website.order.reversed', sale_made: false, create_dispatch: false, requires_review: true });
-    const headers = fetcher.mock.calls[0][1]?.headers as Record<string, string>;
-    expect(headers['Idempotency-Key']).toBe(`website.order.reversed:${order.id}`);
+    const fetcher = vi.spyOn(globalThis, 'fetch').mockImplementation(async () => new Response(JSON.stringify({ record_id: randomUUID() })));
+    await expect(deliverFinanceHandoff(order.id)).resolves.toMatchObject({ delivered: true, eventType: 'website.order.paid' });
+    await expect(deliverFinanceHandoff(order.id)).resolves.toMatchObject({ delivered: true, eventType: 'website.order.reversed' });
+    await expect(deliverFinanceHandoff(order.id)).resolves.toMatchObject({ delivered: false });
+    expect(fetcher).toHaveBeenCalledTimes(2);
+    const payloads = fetcher.mock.calls.map((call) => JSON.parse(String(call[1]?.body)));
+    expect(payloads[0]).toMatchObject({ event: 'website.order.paid', order_status: 'paid', sale_made: true, create_dispatch: true, requires_review: false, payment: { confirmation_code: 'PAID-CODE' } });
+    expect(payloads[1]).toMatchObject({ event: 'website.order.reversed', order_status: 'refund_or_reversal_review', sale_made: false, create_dispatch: false, requires_review: true, payment: { confirmation_code: 'REVERSAL-CODE' } });
   });
 
   it('records a verified school-support payment once and hands it to finance once', async () => {
@@ -190,6 +207,49 @@ suite('PostgreSQL Pesapal order ledger', () => {
     await createSchoolSupportPayment(request, pesapal);
     await expect(createSchoolSupportPayment({ ...request, amountKsh: 2500 }, pesapal)).rejects.toThrow(/idempotency key/i);
     expect((pesapal as { submitOrder: ReturnType<typeof vi.fn> }).submitOrder).toHaveBeenCalledTimes(1);
+  });
+
+  it('fails closed when a legacy school-support idempotency row has no request fingerprint', async () => {
+    process.env.SCHOOL_SUPPORT_ENABLED = 'true';
+    process.env.SCHOOL_SUPPORT_FINANCE_APPROVED = 'true';
+    const request = {
+      fullName: 'Legacy Supporter', phone: '0712345678', email: '', amountKsh: 1000,
+      message: '', idempotencyKey: randomUUID(), consent: true as const,
+    };
+    const pesapal = accepted();
+    const support = await createSchoolSupportPayment(request, pesapal);
+    await database()`UPDATE website_school_support SET request_fingerprint = NULL WHERE id = ${support.id}`;
+    await expect(createSchoolSupportPayment({ ...request, fullName: 'Changed Legacy Supporter' }, pesapal)).rejects.toThrow(/idempotency key/i);
+    expect((pesapal as { submitOrder: ReturnType<typeof vi.fn> }).submitOrder).toHaveBeenCalledTimes(1);
+  });
+
+  it('durably delivers both school-support completion and reversal exactly once when both are queued', async () => {
+    process.env.SCHOOL_SUPPORT_ENABLED = 'true';
+    process.env.SCHOOL_SUPPORT_FINANCE_APPROVED = 'true';
+    const support = await createSchoolSupportPayment({
+      fullName: 'School Supporter', phone: '0712345678', email: '', amountKsh: 1000,
+      message: '', idempotencyKey: randomUUID(), consent: true,
+    }, accepted());
+    const notification = {
+      trackingId: support.provider_tracking_id!, merchantReference: support.public_reference,
+      notificationType: 'IPNCHANGE', raw: { redacted: true },
+    };
+    await processPesapalSchoolSupportNotification(notification, providerStatus(support.public_reference, 1000, 'COMPLETED', 'SCHOOL-PAID'));
+    await processPesapalSchoolSupportNotification(notification, providerStatus(support.public_reference, 1000, 'REVERSED', 'SCHOOL-REVERSAL'));
+    const queued = await database()<{ event_type: string }[]>`SELECT event_type FROM website_support_handoffs WHERE support_id = ${support.id} ORDER BY created_at, event_type`;
+    expect(queued.map((row) => row.event_type)).toEqual(['website.school_support.completed', 'website.school_support.reversed']);
+
+    process.env.FINANCE_WEBHOOK_URL = 'https://finance.example.test/intake';
+    process.env.FINANCE_WEBHOOK_ALLOWED_HOSTS = 'finance.example.test';
+    process.env.FINANCE_WEBHOOK_SECRET = 'test-only-finance-handoff-secret-32';
+    const fetcher = vi.spyOn(globalThis, 'fetch').mockImplementation(async () => new Response(JSON.stringify({ record_id: randomUUID() })));
+    await expect(deliverSchoolSupportFinanceHandoff(support.id)).resolves.toMatchObject({ delivered: true, eventType: 'website.school_support.completed' });
+    await expect(deliverSchoolSupportFinanceHandoff(support.id)).resolves.toMatchObject({ delivered: true, eventType: 'website.school_support.reversed' });
+    await expect(deliverSchoolSupportFinanceHandoff(support.id)).resolves.toMatchObject({ delivered: false });
+    expect(fetcher).toHaveBeenCalledTimes(2);
+    const payloads = fetcher.mock.calls.map((call) => JSON.parse(String(call[1]?.body)));
+    expect(payloads[0]).toMatchObject({ event: 'website.school_support.completed', support_status: 'completed', sale_made: true, payment: { confirmation_code: 'SCHOOL-PAID' } });
+    expect(payloads[1]).toMatchObject({ event: 'website.school_support.reversed', support_status: 'reversed', sale_made: false, payment: { confirmation_code: 'SCHOOL-REVERSAL' } });
   });
 
   it('does not let submit-order persistence downgrade a callback-completed school payment', async () => {

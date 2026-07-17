@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { catalogById } from './catalog';
+import { isApprovedPublicHttpsUrl } from './network-security';
 
 export const cartItemSchema = z.object({
   productId: z.string().min(1).max(80),
@@ -102,16 +103,7 @@ export function paymentRuntimeReady() {
     || !allowedFinanceHosts.length
     || (process.env.FINANCE_WEBHOOK_SECRET?.length ?? 0) < 32
     || retrySecret.length < 32) return false;
-  try {
-    const endpoint = new URL(rawFinanceUrl);
-    return endpoint.protocol === 'https:'
-      && !endpoint.username && !endpoint.password && !endpoint.search && !endpoint.hash
-      && allowedFinanceHosts.includes(endpoint.host.toLowerCase())
-      && endpoint.hostname.toLowerCase() !== 'localhost'
-      && !endpoint.hostname.toLowerCase().endsWith('.local');
-  } catch {
-    return false;
-  }
+  return isApprovedPublicHttpsUrl(rawFinanceUrl, allowedFinanceHosts);
 }
 
 export function assertCommerceApproved() {
