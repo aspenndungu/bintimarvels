@@ -1,18 +1,3 @@
-import { Metadata } from 'next';
-export const metadata: Metadata = { title: 'Messaging & Consent Policy' };
-export default function Page() {
-  return (
-    <div className="max-w-3xl mx-auto px-4 py-24 min-h-screen">
-      <h1 className="font-display font-black text-4xl text-brand-dark mb-8">Messaging & Consent</h1>
-      <div className="bg-white rounded-2xl p-8 border border-brand-clay shadow-sm space-y-6 text-brand-dark-light text-sm leading-relaxed">
-        <p>We respect your inbox and your WhatsApp. Here is how we communicate with you:</p>
-        <h2 className="text-lg font-bold text-brand-dark mt-6">Order Updates (Utility)</h2>
-        <p>When you place an order, you agree to receive essential updates (order confirmation, delivery tracking, and payment receipts) via WhatsApp or SMS. These are necessary to fulfill your purchase.</p>
-        <h2 className="text-lg font-bold text-brand-dark mt-6">Marketing & Reminders</h2>
-        <p>We will never send you promotional offers or cycle reminders unless you explicitly check the optional opt-in boxes during checkout or signup.</p>
-        <h2 className="text-lg font-bold text-brand-dark mt-6">How to Opt-Out</h2>
-        <p>You can withdraw your consent at any time. Simply reply <strong>STOP</strong> to any of our marketing messages on WhatsApp or SMS, and you will be immediately removed from our marketing lists.</p>
-      </div>
-    </div>
-  );
-}
+import type { Metadata } from 'next';
+export const metadata: Metadata = { title: 'Messaging & Consent' };
+export default function Page(){return <main className="mx-auto min-h-screen max-w-4xl px-5 py-20"><p className="text-xs font-bold uppercase tracking-[.22em] text-brand-gold-dark">Your choices</p><h1 className="mt-4 font-serif text-5xl text-brand-dark sm:text-6xl">Messaging & Consent</h1><div className="mt-8 space-y-7 rounded-[2rem] border border-brand-clay bg-white p-7 text-sm leading-relaxed text-brand-dark-light sm:p-10"><p>Last updated: 15 July 2026</p><h2 className="text-xl font-bold text-brand-dark">Order and enquiry communication</h2><p>When you contact Binti, the team may use the phone number, WhatsApp account or email you supplied to answer the enquiry, confirm an order or payment, coordinate delivery and provide necessary support.</p><h2 className="text-xl font-bold text-brand-dark">Marketing is separate</h2><p>Promotional messaging requires a separate, optional choice. Refusing marketing does not stop you from ordering Mrembo or asking for support. Binti does not ask for cycle dates to send reminders.</p><h2 className="text-xl font-bold text-brand-dark">Stopping marketing</h2><p>Use the opt-out method in the message or contact Binti. Necessary communication may continue only where needed to complete an active order, delivery, refund or support request.</p><p>Questions can be sent to <a className="font-bold text-brand-berry underline" href="mailto:binticreationsllc@gmail.com">binticreationsllc@gmail.com</a>.</p></div></main>}

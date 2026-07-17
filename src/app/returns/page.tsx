@@ -1,17 +1,3 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 export const metadata: Metadata = { title: 'Returns & Refunds' };
-export default function Page() {
-  return (
-    <div className="max-w-3xl mx-auto px-4 py-24 min-h-screen">
-      <h1 className="font-display font-black text-4xl text-brand-dark mb-8">Returns & Refunds</h1>
-      <div className="bg-white rounded-2xl p-8 border border-brand-clay shadow-sm space-y-6 text-brand-dark-light text-sm leading-relaxed">
-        <p>Your comfort and satisfaction are our priority, but due to the sanitary nature of our products, we enforce strict return guidelines.</p>
-        <h2 className="text-lg font-bold text-brand-dark mt-6">Eligible Returns</h2>
-        <p>Returns are only accepted if the product packaging is unopened, sealed, and in its original condition, or if the product arrived damaged/defective. You must report any issues within 48 hours of delivery.</p>
-        <h2 className="text-lg font-bold text-brand-dark mt-6">Refund Process</h2>
-        <p>If a return is approved, we will process a replacement or a full refund via M-Pesa or your original payment method within 3 business days.</p>
-        <p>To initiate a return, please contact us on WhatsApp at +254 717 345 841.</p>
-      </div>
-    </div>
-  );
-}
+export default function Page(){return <main className="mx-auto min-h-screen max-w-4xl px-5 py-20"><p className="text-xs font-bold uppercase tracking-[.22em] text-brand-gold-dark">Order support</p><h1 className="mt-4 font-serif text-5xl text-brand-dark sm:text-6xl">Returns & Refunds</h1><div className="mt-8 space-y-7 rounded-[2rem] border border-brand-clay bg-white p-7 text-sm leading-relaxed text-brand-dark-light sm:p-10"><p>Last updated: 15 July 2026</p><p>Please inspect your Mrembo delivery when it arrives. Contact Binti as soon as possible if the order is incorrect, damaged in transit or appears defective.</p><h2 className="text-xl font-bold text-brand-dark">Unopened sanitary products</h2><p>Because Mrembo is an intimate sanitary product, opened packs cannot normally be returned. Unopened products may be reviewed when the delivered item is incorrect, damaged or potentially defective.</p><h2 className="text-xl font-bold text-brand-dark">What to send</h2><p>Share the order reference, a brief explanation and clear photographs where appropriate. Do not send your M-Pesa PIN, card details or unnecessary personal information.</p><h2 className="text-xl font-bold text-brand-dark">How Binti reviews a request</h2><p>The team checks the order, delivery and payment records before deciding whether a replacement, refund or payment reversal is appropriate. Binti will explain the outcome and the next step.</p><h2 className="text-xl font-bold text-brand-dark">Payment safety</h2><p>Approved refunds or reversals are authorised and recorded by Binti’s finance team and handled through the relevant provider. Binti will never ask for your M-Pesa PIN or card details.</p><p>Start a review on WhatsApp or phone: <a className="font-bold text-brand-berry underline" href="tel:+254717345841">+254 717 345 841</a>.</p></div></main>}

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Outfit, Playfair_Display, JetBrains_Mono, Caveat } from "next/font/google";
 import "./globals.css";
+import "leaflet/dist/leaflet.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { CartProvider } from "@/components/CartContext";
@@ -16,10 +17,10 @@ const caveat = Caveat({ subsets: ["latin"], variable: "--font-cursive" });
 export const metadata: Metadata = {
   metadataBase: new URL('https://bintimarvels.com'),
   title: {
-    default: "Mrembo Pads — Premium African Period Care | BINTI MARVELS LIMITED",
+    default: "Binti Marvels — Mrembo Pads & School Support",
     template: "%s | BINTI MARVELS LIMITED",
   },
-  description: "Comfort for the woman who keeps showing up. Premium Kenyan sanitary pads by BINTI MARVELS LIMITED. Shop online or order via WhatsApp.",
+  description: "Binti Marvels is the company behind made-in-Kenya Mrembo period care, school pad support, Binti Charity and Binti Circles.",
   openGraph: {
     type: "website",
     locale: "en_KE",
@@ -36,13 +37,17 @@ const organizationJsonLd = {
   legalName: "BINTI MARVELS LIMITED",
   url: "https://bintimarvels.com",
   email: "binticreationsllc@gmail.com",
-  address: {
-    "@type": "PostalAddress",
-    streetAddress: "CIATA MALL, KIAMBU ROAD",
-    addressLocality: "Kiambu",
-    postalCode: "00200",
-    addressCountry: "KE",
-  },
+  telephone: "+254717345841",
+  areaServed: "Kenya",
+  brand: { "@type": "Brand", name: "Mrembo" },
+  sameAs: [
+    "https://www.instagram.com/mrembopads/",
+    "https://www.tiktok.com/@mrembo_254",
+    "https://www.instagram.com/bintipads_ke",
+    "https://www.facebook.com/Bintipadske/",
+    "https://www.tiktok.com/@bintipads",
+    "https://x.com/bintipads_ke",
+  ],
 };
 
 export default function RootLayout({
@@ -59,12 +64,13 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
         />
+        <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[200] focus:rounded-lg focus:bg-white focus:p-3">Skip to content</a>
         <CartProvider>
           <Header />
           <CartDrawer />
-          <main className="min-h-screen">
+          <div id="main-content" className="min-h-screen">
             {children}
-          </main>
+          </div>
           <WhatsAppFAB />
           <Footer />
         </CartProvider>

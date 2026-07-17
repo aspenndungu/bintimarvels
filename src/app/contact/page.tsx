@@ -1,107 +1,25 @@
-import { Metadata } from 'next';
-import { Mail, MessageSquare, Clock, MapPin } from 'lucide-react';
+import { Suspense } from 'react';
+import type { Metadata } from 'next';
+import { HeartHandshake, MessageCircle, Newspaper, ShoppingBag, Store, Users } from 'lucide-react';
+import ContactForm from '@/components/ContactForm';
+import SocialLinks from '@/components/SocialLinks';
 
-export const metadata: Metadata = {
-  title: 'Contact & Support',
-};
+export const metadata: Metadata = { title: 'Contact Binti Marvels', description: 'Contact Binti Marvels about Mrembo orders, Binti Charity, Binti Circles, stockists, wholesale and media.' };
 
-export default function Page() {
+const intents = [
+  { icon: ShoppingBag, title: 'Order help', text: 'Bundle, stock or delivery questions.' },
+  { icon: Store, title: 'Stockist & wholesale', text: 'Bring Mrembo closer to your customers.' },
+  { icon: HeartHandshake, title: 'Binti Charity', text: 'Fund product supply for an agreed community.' },
+  { icon: Users, title: 'Binti Circles', text: 'Community, conversation and activations.' },
+  { icon: Newspaper, title: 'Media', text: 'Founder, product and company enquiries.' },
+] as const;
+
+export default function ContactPage() {
   return (
-    <div className="min-h-screen bg-brand-cream relative overflow-hidden selection:bg-brand-berry selection:text-white pb-20">
-      
-      {/* Decorative BG */}
-      <div className="absolute top-0 right-0 w-full md:w-2/3 h-96 bg-[#4D0F28] rounded-bl-[100px] z-0 opacity-5 pointer-events-none"></div>
-
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 relative z-10 pt-24 md:pt-32">
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-clay/30 border border-brand-clay/50 text-brand-dark font-medium text-xs tracking-wider uppercase mb-6">
-            <MessageSquare className="w-3.5 h-3.5" />
-            <span>We&apos;re Here For You</span>
-          </div>
-          <h1 className="font-display font-black text-4xl md:text-5xl lg:text-6xl text-brand-dark mb-6 leading-tight tracking-tight">
-            Let&apos;s keep the <br/><span className="text-brand-berry">conversation going.</span>
-          </h1>
-          <p className="text-brand-dark-light text-base md:text-lg leading-relaxed">
-            Whether you need help with an order, want to discuss a bulk purchase, or just have a question about Mrembo Pads, our team is ready to support you.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 max-w-3xl mx-auto">
-          {/* WhatsApp Card */}
-          <div className="bg-white rounded-3xl p-8 border border-brand-clay shadow-sm hover:shadow-md transition-shadow group">
-            <div className="w-12 h-12 bg-[#25D366]/10 text-[#25D366] rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-              <MessageSquare className="w-6 h-6" />
-            </div>
-            <h3 className="font-display font-bold text-2xl text-brand-dark mb-2">WhatsApp Us</h3>
-            <p className="text-brand-dark-light text-sm leading-relaxed mb-6">
-              The fastest way to reach us. Chat with our support team for immediate assistance with orders or general inquiries.
-            </p>
-            <a href="https://wa.me/254717345841" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center w-full bg-[#25D366] text-white font-bold py-3 px-6 rounded-xl hover:bg-[#1EBE5D] transition-colors shadow-sm">
-              Chat on WhatsApp
-            </a>
-          </div>
-
-          {/* Email Card */}
-          <div className="bg-white rounded-3xl p-8 border border-brand-clay shadow-sm hover:shadow-md transition-shadow group">
-            <div className="w-12 h-12 bg-brand-berry/10 text-brand-berry rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-              <Mail className="w-6 h-6" />
-            </div>
-            <h3 className="font-display font-bold text-2xl text-brand-dark mb-2">Email Support</h3>
-            <p className="text-brand-dark-light text-sm leading-relaxed mb-6">
-              For official correspondence, media inquiries, or if you prefer to communicate via email. We typically reply within 24 hours.
-            </p>
-            <a href="mailto:binticreationsllc@gmail.com" className="inline-flex items-center justify-center w-full bg-brand-dark text-brand-cream font-bold py-3 px-6 rounded-xl hover:bg-[#1A030C] transition-colors shadow-sm">
-              binticreationsllc@gmail.com
-            </a>
-          </div>
-        </div>
-
-        {/* Additional Info */}
-        <div className="mt-12 max-w-3xl mx-auto bg-[#FAF7F2] rounded-3xl p-6 md:p-8 border border-brand-clay flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-          <div className="flex items-start gap-4">
-            <Clock className="w-6 h-6 text-brand-gold shrink-0 mt-1" />
-            <div>
-              <h4 className="font-bold text-brand-dark">Business Hours</h4>
-              <p className="text-sm text-brand-dark-light mt-1">Monday - Saturday<br/>8:00 AM - 6:00 PM (EAT)</p>
-            </div>
-          </div>
-          <div className="hidden md:block w-px h-12 bg-brand-clay"></div>
-          <div className="flex items-start gap-4">
-            <MapPin className="w-6 h-6 text-brand-gold shrink-0 mt-1" />
-            <div>
-              <h4 className="font-bold text-brand-dark">Our Location</h4>
-              <p className="text-sm text-brand-dark-light mt-1">CIATA MALL, Kiambu Road<br/>Kiambu, Kenya</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Legal Business Information */}
-        <section className="mt-8 max-w-3xl mx-auto bg-white rounded-3xl p-6 md:p-8 border border-brand-clay shadow-sm">
-          <h2 className="font-display font-bold text-2xl text-brand-dark mb-4">Legal Business Information</h2>
-          <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4 text-sm">
-            <div>
-              <dt className="font-bold text-brand-dark">Legal name</dt>
-              <dd className="text-brand-dark-light">BINTI MARVELS LIMITED</dd>
-            </div>
-            <div>
-              <dt className="font-bold text-brand-dark">Date of incorporation</dt>
-              <dd className="text-brand-dark-light">17 May 2021</dd>
-            </div>
-            <div className="sm:col-span-2">
-              <dt className="font-bold text-brand-dark">Registered business address</dt>
-              <dd className="text-brand-dark-light">CIATA MALL, KIAMBU ROAD, P.O. BOX 35316-00200, KIAMBU, KENYA</dd>
-            </div>
-            <div>
-              <dt className="font-bold text-brand-dark">Country</dt>
-              <dd className="text-brand-dark-light">Kenya</dd>
-            </div>
-            <div>
-              <dt className="font-bold text-brand-dark">Email</dt>
-              <dd className="text-brand-dark-light">binticreationsllc@gmail.com</dd>
-            </div>
-          </dl>
-        </section>
-      </div>
-    </div>
+    <main className="min-h-screen bg-brand-cream">
+      <section className="px-5 pb-12 pt-16 sm:px-8 lg:pb-16 lg:pt-24"><div className="mx-auto max-w-7xl"><p className="text-xs font-bold uppercase tracking-[.25em] text-brand-gold-dark">Contact Binti</p><h1 className="mt-4 max-w-4xl font-serif text-5xl leading-[.96] sm:text-7xl">Start the right conversation.</h1><p className="mt-6 max-w-2xl text-lg leading-relaxed text-brand-dark-light">Order Mrembo, find a stockist, discuss Binti Charity or invite the team into a wider conversation.</p></div></section>
+      <section className="px-5 pb-20 sm:px-8 lg:pb-28"><div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[.8fr_1.2fr]"><div><div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">{intents.map(({icon:Icon,title,text})=><article key={title} className="flex gap-4 rounded-2xl border border-brand-clay bg-white p-5"><span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand-cream-dark text-brand-berry"><Icon className="h-5 w-5"/></span><div><h2 className="font-display text-lg font-bold">{title}</h2><p className="mt-1 text-sm leading-relaxed text-brand-dark-light">{text}</p></div></article>)}</div><a href="https://wa.me/254717345841" className="mt-6 flex items-center justify-center gap-2 rounded-full bg-[#15803d] px-6 py-3.5 font-bold text-white"><MessageCircle className="h-5 w-5"/> WhatsApp Binti</a><div className="mt-8 rounded-[2rem] bg-[#26030f] p-7 text-white"><p className="text-xs font-bold uppercase tracking-[.2em] text-brand-gold">Direct contact</p><p className="mt-4 text-sm leading-relaxed text-brand-clay"><strong className="text-white">Phone / WhatsApp</strong><br/>+254 717 345 841</p><p className="mt-4 text-sm leading-relaxed text-brand-clay"><strong className="text-white">Email</strong><br/>binticreationsllc@gmail.com</p><p className="mt-4 text-sm leading-relaxed text-brand-clay"><strong className="text-white">Fulfilment</strong><br/>Binti coordinates orders from Mombasa Road and confirms the exact delivery destination with each customer.</p></div></div><Suspense fallback={<div className="rounded-[2rem] bg-white p-8">Loading form…</div>}><ContactForm /></Suspense></div></section>
+      <section className="bg-brand-cream-dark px-5 py-20 sm:px-8"><div className="mx-auto max-w-7xl"><p className="text-xs font-bold uppercase tracking-[.22em] text-brand-gold-dark">Follow Binti & Mrembo</p><h2 className="mt-4 font-serif text-4xl sm:text-5xl">Stay close to products, people and projects.</h2><div className="mt-8 max-w-3xl"><SocialLinks /></div></div></section>
+    </main>
   );
 }

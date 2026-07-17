@@ -1,91 +1,12 @@
 'use client';
 import { X, ChevronRight, MessageCircle } from 'lucide-react';
 import Link from 'next/link';
-import Image from 'next/image';
+import { useModalDialog } from './useModalDialog';
 
-interface MobileNavProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
+const links = [['/','Home'],['/our-story','Our Story'],['/shop','Shop Mrembo'],['/binti-circles','Binti Circles'],['/binti-charity','Binti Charity'],['/binti-charity#donate','Donate to schools'],['/contact','Contact']] as const;
 
-export default function MobileNav({ isOpen, onClose }: MobileNavProps) {
+export default function MobileNav({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+  const dialogRef = useModalDialog(isOpen, onClose);
   if (!isOpen) return null;
-
-  return (
-    <>
-      <div 
-        className="fixed inset-0 bg-black/40 z-50 backdrop-blur-sm lg:hidden"
-        onClick={onClose}
-      />
-      <div className="fixed top-0 left-0 h-full w-full max-w-[280px] bg-[#FAF7F2] z-50 shadow-2xl flex flex-col animate-slide-in-left lg:hidden">
-        <div className="p-4 border-b border-brand-clay flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-full overflow-hidden border-2 border-brand-gold">
-              <Image src="/mrembo_logo.jpg" alt="Logo" width={32} height={32} />
-            </div>
-            <span className="font-display font-black text-brand-dark uppercase">Mrembo</span>
-          </div>
-          <button 
-            onClick={onClose}
-            className="p-2 hover:bg-brand-clay rounded-full transition-colors cursor-pointer"
-          >
-            <X className="w-5 h-5 text-brand-dark-light" />
-          </button>
-        </div>
-        
-        <div className="flex-1 overflow-y-auto py-4">
-          <nav className="flex flex-col space-y-1">
-            <div className="px-4 py-2 text-xs font-bold uppercase tracking-wider text-brand-clay-dark">
-              Shop
-            </div>
-            <Link href="/#mrembo-range" onClick={onClose} className="px-4 py-3 flex items-center justify-between text-brand-dark font-medium hover:bg-white transition-colors">
-              Bundles & Packs
-              <ChevronRight className="w-4 h-4 text-brand-clay-dark" />
-            </Link>
-            <Link href="/#checkout" onClick={onClose} className="px-4 py-3 flex items-center justify-between text-brand-dark font-medium hover:bg-white transition-colors">
-              Quick Checkout
-              <ChevronRight className="w-4 h-4 text-brand-clay-dark" />
-            </Link>
-            
-            <div className="px-4 py-2 mt-4 text-xs font-bold uppercase tracking-wider text-brand-clay-dark">
-              About
-            </div>
-            <Link href="/#founder-trust" onClick={onClose} className="px-4 py-3 flex items-center justify-between text-brand-dark font-medium hover:bg-white transition-colors">
-              About Us & Founder
-              <ChevronRight className="w-4 h-4 text-brand-clay-dark" />
-            </Link>
-            <Link href="/#csr-schools" onClick={onClose} className="px-4 py-3 flex items-center justify-between text-brand-dark font-medium hover:bg-white transition-colors">
-              Binti Impact
-              <ChevronRight className="w-4 h-4 text-brand-clay-dark" />
-            </Link>
-            <Link href="/#stockists" onClick={onClose} className="px-4 py-3 flex items-center justify-between text-brand-dark font-medium hover:bg-white transition-colors">
-              Stockists & Partners
-              <ChevronRight className="w-4 h-4 text-brand-clay-dark" />
-            </Link>
-            
-            <div className="px-4 py-2 mt-4 text-xs font-bold uppercase tracking-wider text-brand-clay-dark">
-              Support
-            </div>
-            <Link href="/contact" onClick={onClose} className="px-4 py-3 flex items-center justify-between text-brand-dark font-medium hover:bg-white transition-colors">
-              Contact Us
-              <ChevronRight className="w-4 h-4 text-brand-clay-dark" />
-            </Link>
-          </nav>
-        </div>
-        
-        <div className="p-4 border-t border-brand-clay bg-white">
-          <button 
-            onClick={() => {
-              window.open('https://wa.me/254717345841?text=Hi,%20I%20need%20help%20with%20Mrembo%20Pads', '_blank');
-              onClose();
-            }}
-            className="w-full py-3 bg-[#25D366] text-white rounded-xl font-bold flex items-center justify-center gap-2 cursor-pointer hover:bg-[#20bd5a] transition-colors"
-          >
-            <MessageCircle className="w-5 h-5" />
-            WhatsApp Support
-          </button>
-        </div>
-      </div>
-    </>
-  );
+  return <div className="fixed inset-0 z-50 lg:hidden"><button className="absolute inset-0 bg-black/50" onClick={onClose} aria-label="Close menu backdrop"/><div ref={dialogRef} className="relative flex h-full w-[86%] max-w-sm flex-col bg-brand-cream shadow-2xl" role="dialog" aria-modal="true" aria-label="Site navigation"><div className="flex items-center justify-between border-b border-brand-clay p-5"><strong id="mobile-nav-title" className="font-display text-xl text-brand-dark">BINTI MARVELS</strong><button onClick={onClose} aria-label="Close menu" className="rounded-full p-2"><X className="h-5 w-5"/></button></div><nav className="flex-1 overflow-y-auto p-3">{links.map(([href,label])=><Link key={href} href={href} onClick={onClose} className={`flex items-center justify-between rounded-xl px-4 py-4 font-bold ${href.includes('#donate') ? 'bg-brand-berry text-white' : 'text-brand-dark hover:bg-white'}`}>{label}<ChevronRight className={`h-4 w-4 ${href.includes('#donate') ? 'text-brand-gold' : 'text-brand-gold-dark'}`}/></Link>)}</nav><div className="border-t border-brand-clay p-5"><a href="https://wa.me/254717345841" target="_blank" rel="noreferrer" className="flex w-full items-center justify-center gap-2 rounded-full bg-[#15803d] py-3 font-bold text-white"><MessageCircle className="h-5 w-5"/> WhatsApp support</a></div></div></div>;
 }

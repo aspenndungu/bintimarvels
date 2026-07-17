@@ -1,5 +1,2 @@
-import MremboLandingPage from '@/components/MremboLandingPage';
-
-export default function Home() {
-  return <MremboLandingPage />;
-}
+import HomePage from '@/components/HomePage';
+export default function Page() { return <HomePage />; }

@@ -1,19 +1,3 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 export const metadata: Metadata = { title: 'Terms of Service' };
-export default function Page() {
-  return (
-    <div className="max-w-3xl mx-auto px-4 py-24 min-h-screen">
-      <h1 className="font-display font-black text-4xl text-brand-dark mb-8">Terms of Service</h1>
-      <div className="bg-white rounded-2xl p-8 border border-brand-clay shadow-sm space-y-6 text-brand-dark-light text-sm leading-relaxed">
-        <p>Welcome to BINTI MARVELS LIMITED. By using our website and purchasing our products, you agree to these terms.</p>
-        <p><strong className="text-brand-dark">Legal business:</strong> BINTI MARVELS LIMITED, registered in Kenya. Registered business address: CIATA MALL, KIAMBU ROAD, P.O. BOX 35316-00200, KIAMBU, KENYA. Email: binticreationsllc@gmail.com.</p>
-        <h2 className="text-lg font-bold text-brand-dark mt-6">Product Use & Medical Disclaimer</h2>
-        <p>Mrembo Pads are designed for everyday comfort and menstrual hygiene. They are not intended to cure or prevent any medical condition. Please discontinue use if irritation occurs.</p>
-        <h2 className="text-lg font-bold text-brand-dark mt-6">Purchasing & Resale</h2>
-        <p>Products purchased on this site are for personal use unless you are an approved authorized stockist. Unauthorized resale is prohibited.</p>
-        <h2 className="text-lg font-bold text-brand-dark mt-6">Changes to Terms</h2>
-        <p>We reserve the right to update these terms at any time. Continued use of the site constitutes acceptance of the new terms.</p>
-      </div>
-    </div>
-  );
-}
+export default function Page(){return <main className="mx-auto min-h-screen max-w-4xl px-5 py-20"><p className="text-xs font-bold uppercase tracking-[.22em] text-brand-gold-dark">Shopping with Binti</p><h1 className="mt-4 font-serif text-5xl text-brand-dark sm:text-6xl">Terms of Service</h1><div className="mt-8 space-y-7 rounded-[2rem] border border-brand-clay bg-white p-7 text-sm leading-relaxed text-brand-dark-light sm:p-10"><p>Last updated: 15 July 2026</p><p>This website is operated by Binti Marvels Limited in Kenya. Mrembo is the current period-care product offered through the site.</p><h2 className="text-xl font-bold text-brand-dark">Products and prices</h2><p>Product descriptions and bundle prices are shown in Kenyan shillings. Availability may change. Binti confirms the bundle, stock, delivery destination, delivery cost and final total before asking for payment.</p><h2 className="text-xl font-bold text-brand-dark">Delivery</h2><p>Binti delivers to the customer’s selected address or an agreed drop-off point. The delivery price applies to the location selected and updates when the destination changes. Binti confirms the final amount before payment.</p><h2 className="text-xl font-bold text-brand-dark">Payment and order confirmation</h2><p>An enquiry, basket or delivery price is not a paid order. An order becomes confirmed only after Binti accepts it and verifies payment through Pesapal or another stated provider. Binti never asks for your M-Pesa PIN or card details; enter payment credentials only on the provider’s secure page.</p><h2 className="text-xl font-bold text-brand-dark">Binti Charity supply</h2><p>Schools, employers, community groups and CSR supporters may ask Binti to prepare and deliver Mrembo supply for an agreed school or community. Individuals may also make a school-support payment through Pesapal. Binti applies verified support to approved school pad work. No tax-deductibility is promised and no tax-deductible donation receipt is issued. Named-school and larger projects are confirmed directly with Binti.</p><h2 className="text-xl font-bold text-brand-dark">Product information</h2><p>Product information describes Mrembo and is not medical advice. If you have a health concern or reaction, stop use and seek advice from an appropriate healthcare professional.</p><h2 className="text-xl font-bold text-brand-dark">Contact</h2><p>Email <a className="font-bold text-brand-berry underline" href="mailto:binticreationsllc@gmail.com">binticreationsllc@gmail.com</a> or call <a className="font-bold text-brand-berry underline" href="tel:+254717345841">+254 717 345 841</a>.</p></div></main>}

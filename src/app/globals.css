@@ -77,3 +77,37 @@
 @utility animate-toast {
   animation: slideUpToast 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+
+:focus-visible {
+  outline: 3px solid var(--color-brand-gold);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
+
+.leaflet-container { font-family: inherit; z-index: 0; }
+.delivery-map-pin {
+  display: block;
+  position: relative;
+  width: 32px;
+  height: 32px;
+  border: 5px solid white;
+  border-radius: 50% 50% 50% 0;
+  background: #8f1746;
+  box-shadow: 0 8px 24px rgb(38 3 15 / .35);
+  transform: rotate(-45deg);
+}
+.delivery-map-pin::after {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border-radius: 999px;
+  background: #d9a520;
+}

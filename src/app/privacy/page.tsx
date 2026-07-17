@@ -1,22 +1,3 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 export const metadata: Metadata = { title: 'Privacy Policy' };
-export default function Page() {
-  return (
-    <div className="max-w-3xl mx-auto px-4 py-24 min-h-screen">
-      <h1 className="font-display font-black text-4xl text-brand-dark mb-8">Privacy Policy</h1>
-      <div className="bg-white rounded-2xl p-8 border border-brand-clay shadow-sm space-y-6 text-brand-dark-light text-sm leading-relaxed">
-        <p>At BINTI MARVELS LIMITED, we respect your privacy. This policy explains how we collect and use your data when you visit bintimarvels.com.</p>
-        <p><strong className="text-brand-dark">Legal business:</strong> BINTI MARVELS LIMITED, registered in Kenya. Registered business address: CIATA MALL, KIAMBU ROAD, P.O. BOX 35316-00200, KIAMBU, KENYA.</p>
-        <h2 className="text-lg font-bold text-brand-dark mt-6">What We Collect</h2>
-        <p>We only collect data necessary to fulfill your order or request: Name, Phone/WhatsApp Number, Delivery Address, and specific order preferences.</p>
-        <h2 className="text-lg font-bold text-brand-dark mt-6">How We Use It</h2>
-        <p>Your data is used strictly for order fulfillment, delivery updates, and customer support. If you explicitly opt-in, we may send you marketing or cycle reminders.</p>
-        <h2 className="text-lg font-bold text-brand-dark mt-6">Third-Party Sharing</h2>
-        <p>We share your data only with trusted partners necessary for service delivery, such as delivery riders and our WhatsApp Business provider. We do not sell your data to advertising brokers.</p>
-        <h2 className="text-lg font-bold text-brand-dark mt-6">Your Rights (ODPC Compliance)</h2>
-        <p>Under the Kenya Data Protection Act, you have the right to access, correct, or delete your personal data. You can also withdraw consent at any time.</p>
-        <p>Contact us at <a href="mailto:binticreationsllc@gmail.com" className="text-brand-berry font-bold hover:underline">binticreationsllc@gmail.com</a> for any data requests.</p>
-      </div>
-    </div>
-  );
-}
+export default function Page(){return <main className="mx-auto min-h-screen max-w-4xl px-5 py-20"><p className="text-xs font-bold uppercase tracking-[.22em] text-brand-gold-dark">Your information</p><h1 className="mt-4 font-serif text-5xl text-brand-dark sm:text-6xl">Privacy Policy</h1><div className="mt-8 space-y-7 rounded-[2rem] border border-brand-clay bg-white p-7 text-sm leading-relaxed text-brand-dark-light sm:p-10"><p>Last updated: 15 July 2026</p><p>Binti Marvels Limited uses personal information to answer enquiries, prepare and fulfil Mrembo orders, coordinate delivery, process school-support payments, confirm payment, prevent abuse, reconcile records and meet accounting or legal duties.</p><h2 className="text-xl font-bold text-brand-dark">What we use</h2><p>This may include your name, phone number, email, county, selected delivery address or map pin, nearby landmark, order items, school-support amount and message, payment status and communication choices. We do not ask for pupils’ names, menstrual-cycle dates, M-Pesa PINs or card details.</p><h2 className="text-xl font-bold text-brand-dark">Location information</h2><p>Your selected address or pin is used to prepare the delivery price and coordinate the order with authorised Binti and delivery personnel. It is not published or used to target advertising.</p><h2 className="text-xl font-bold text-brand-dark">Who may receive it</h2><p>Access is limited to authorised Binti customer-support, finance and dispatch users and service providers needed to operate the website, process payment or complete delivery. Binti does not sell customer contact information.</p><h2 className="text-xl font-bold text-brand-dark">Retention and security</h2><p>Binti keeps records only as long as reasonably needed for the service, support, accounting, dispute resolution and legal obligations. Access is restricted, and sensitive service credentials are not stored in the browser.</p><h2 className="text-xl font-bold text-brand-dark">Your choices and rights</h2><p>Marketing permission is optional and separate from order communication. Subject to Kenyan law and records Binti must retain, you may request access, correction, objection or deletion.</p><p>Send a request to <a className="font-bold text-brand-berry underline" href="mailto:binticreationsllc@gmail.com">binticreationsllc@gmail.com</a> or use the <a className="font-bold text-brand-berry underline" href="/data-request">data request page</a>.</p></div></main>}

@@ -1,98 +1,12 @@
-'use client';
-import { useState } from 'react';
 import Link from 'next/link';
+import { ArrowUpRight } from 'lucide-react';
+
+import { SOCIAL_LINKS } from '@/content/site-content';
+
+const explore = [['/our-story','Our Story'],['/shop','Shop Mrembo'],['/binti-charity','Binti Charity'],['/binti-charity#donate','Donate to schools'],['/binti-circles','Binti Circles']] as const;
+const help = [['/contact','Contact'],['/delivery','Delivery'],['/returns','Returns'],['/data-request','Data request']] as const;
+const legal = [['/privacy','Privacy'],['/terms','Terms'],['/consent','Messaging consent']] as const;
 
 export default function Footer() {
-  const [showCookieBanner, setShowCookieBanner] = useState(true);
-
-  return (
-    <>
-      <footer className="bg-brand-dark text-white py-16 relative">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 grid grid-cols-1 md:grid-cols-4 gap-12">
-          
-          <div className="space-y-4">
-            <h4 className="font-display font-bold text-xl">BINTI MARVELS LIMITED</h4>
-            <p className="text-sm text-brand-clay-dark leading-relaxed">
-              Premium African period care. Comfort for the woman who keeps showing up.
-            </p>
-            <div className="pt-2 text-xs text-brand-clay-dark space-y-1">
-              <p>📍 Serving all 47 Kenyan counties</p>
-              <p>✉️ binticreationsllc@gmail.com</p>
-              <p>📞 +254 717 345 841</p>
-            </div>
-          </div>
-          
-          <div className="space-y-4">
-            <h4 className="font-display font-bold text-lg text-brand-gold">Shop Mrembo</h4>
-            <ul className="space-y-2 text-brand-clay/80 font-normal">
-              <li><Link href="/#mrembo-range" className="hover:text-white transition-colors">Daily Comfort Packs</Link></li>
-              <li><Link href="/#mrembo-range" className="hover:text-white transition-colors">Monthly Bundles</Link></li>
-              <li><Link href="/stockists" className="hover:text-white transition-colors">Find a Stockist</Link></li>
-              <li><Link href="/stockists" className="hover:text-white transition-colors">Wholesale & Salons</Link></li>
-            </ul>
-          </div>
-
-          <div className="space-y-4">
-            <h4 className="font-display font-bold text-lg text-brand-gold">Our Mission</h4>
-            <ul className="space-y-2 text-brand-clay/80 font-normal">
-              <li><Link href="/about" className="hover:text-white transition-colors">Our Founder Story</Link></li>
-              <li><Link href="/about" className="hover:text-white transition-colors">Local Manufacturing</Link></li>
-              <li><Link href="/impact" className="hover:text-white transition-colors">School Distribution</Link></li>
-              <li><Link href="/impact" className="hover:text-white transition-colors">Partner with Binti</Link></li>
-            </ul>
-          </div>
-
-          <div className="space-y-4">
-            <h4 className="font-display font-bold text-lg text-brand-gold">Help & Legal</h4>
-            <ul className="space-y-2 text-sm text-brand-clay-dark">
-              <li><Link href="/delivery" className="hover:text-white transition-colors">Delivery & Shipping</Link></li>
-              <li><Link href="/returns" className="hover:text-white transition-colors">Returns & Refunds</Link></li>
-              <li><Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
-              <li><Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link></li>
-              <li><Link href="/consent" className="hover:text-white transition-colors">Consent & Messaging</Link></li>
-              <li><Link href="/data-request" className="hover:text-white transition-colors">Data Request</Link></li>
-              <li><Link href="/contact" className="hover:text-white transition-colors">Contact Support</Link></li>
-            </ul>
-          </div>
-
-        </div>
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 mt-16 pt-8 border-t border-white/10 text-xs text-brand-clay-dark flex flex-col md:flex-row justify-between items-center gap-4">
-          <p>© {new Date().getFullYear()} BINTI MARVELS LIMITED. All rights reserved.</p>
-          <div className="flex gap-4">
-            <span>Kenya data protection rights supported</span>
-            <span>Made in Kenya 🇰🇪</span>
-          </div>
-        </div>
-      </footer>
-
-      {showCookieBanner && (
-        <div className="fixed bottom-0 left-0 right-0 bg-[#FAF7F2] border-t border-[#DFCDC5] p-4 sm:p-6 z-[100] shadow-[0_-4px_20px_rgba(0,0,0,0.05)] select-none">
-          <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-            <div className="flex-1">
-              <h4 className="font-display font-bold text-[#22140F] mb-1">Your Privacy & Consent</h4>
-              <p className="text-xs text-[#3D2921] leading-relaxed">
-                BINTI MARVELS LIMITED uses cookies to ensure our checkout works, improve delivery routing, and measure social media campaigns. 
-                We process personal data securely in Kenya. Read our <Link href="/privacy" className="underline text-brand-berry">Privacy Policy</Link>.
-              </p>
-            </div>
-            <div className="flex items-center gap-3 w-full md:w-auto shrink-0">
-              <button 
-                onClick={() => setShowCookieBanner(false)}
-                className="flex-1 md:flex-none px-4 py-2 bg-white border border-[#DFCDC5] text-[#22140F] rounded-lg text-xs font-bold hover:bg-[#EFE4DF] transition-colors cursor-pointer"
-              >
-                Functional Only
-              </button>
-              <button 
-                onClick={() => setShowCookieBanner(false)}
-                className="flex-1 md:flex-none px-6 py-2 bg-[#5A082C] text-white rounded-lg text-xs font-bold hover:bg-[#3D041C] transition-colors cursor-pointer"
-              >
-                Accept All
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </>
-  );
+  return <footer className="bg-brand-dark px-5 py-16 text-white sm:px-8"><div className="mx-auto max-w-7xl"><div className="grid gap-10 md:grid-cols-2 lg:grid-cols-[1.3fr_.7fr_.7fr_.8fr]"><div><h2 className="font-display text-xl font-bold">BINTI MARVELS</h2><p className="mt-4 max-w-sm text-sm leading-relaxed text-brand-clay-dark">The Kenyan company behind locally made Mrembo period care, Binti Charity and Binti Circles.</p><p className="mt-4 text-sm leading-relaxed text-brand-clay-dark">+254 717 345 841<br/>binticreationsllc@gmail.com</p><p className="mt-5 inline-flex rounded-full border border-brand-gold/35 px-4 py-2 text-xs font-bold uppercase tracking-[.16em] text-brand-gold">Mrembo · Made in Kenya</p></div><div><h3 className="font-bold text-brand-gold">Explore</h3><ul className="mt-4 space-y-2 text-sm">{explore.map(([href,label])=><li key={href}><Link href={href} className="text-brand-clay-dark hover:text-white">{label}</Link></li>)}</ul></div><div><h3 className="font-bold text-brand-gold">Help</h3><ul className="mt-4 space-y-2 text-sm">{help.map(([href,label])=><li key={href}><Link href={href} className="text-brand-clay-dark hover:text-white">{label}</Link></li>)}</ul><h3 className="mt-7 font-bold text-brand-gold">Legal</h3><ul className="mt-4 space-y-2 text-sm">{legal.map(([href,label])=><li key={href}><Link href={href} className="text-brand-clay-dark hover:text-white">{label}</Link></li>)}</ul></div><div><h3 className="font-bold text-brand-gold">Follow the work</h3><div className="mt-4 grid gap-2">{SOCIAL_LINKS.map(item=><a key={item.href} href={item.href} target="_blank" rel="noreferrer" className="inline-flex items-center justify-between text-sm text-brand-clay-dark hover:text-white">{item.label}<ArrowUpRight className="h-3.5 w-3.5"/></a>)}</div></div></div><div className="mt-12 flex flex-col justify-between gap-3 border-t border-white/10 pt-6 text-xs text-brand-clay-dark sm:flex-row"><p>© 2026 Binti Marvels Limited.</p><p>Made in Kenya, with dignity at the centre.</p></div></div></footer>;
 }

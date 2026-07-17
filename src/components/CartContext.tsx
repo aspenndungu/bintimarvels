@@ -1,88 +1,73 @@
 'use client';
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { MremboProduct } from '@/types';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState, ReactNode } from 'react';
+import { catalogById, type CatalogProduct } from '@/lib/catalog';
 
-export interface CartItem {
-  product: MremboProduct;
-  qty: number;
-}
-
+export interface CartItem { product: CatalogProduct; qty: number }
+interface StoredItem { productId: string; qty: number }
 interface CartContextType {
   cart: CartItem[];
-  addToCart: (product: MremboProduct) => void;
+  addToCart: (product: CatalogProduct) => void;
   updateQuantity: (productId: string, delta: number) => void;
   removeFromCart: (productId: string) => void;
+  clearCart: () => void;
   cartCount: number;
   totalPrice: number;
   isCartOpen: boolean;
-  setIsCartOpen: (isOpen: boolean) => void;
-  purchaseType: 'once' | 'subscription';
-  setPurchaseType: (type: 'once' | 'subscription') => void;
+  hydrated: boolean;
+  setIsCartOpen: (open: boolean) => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
+const STORAGE_KEY = 'binti-mrembo-cart-v1';
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [hydrated, setHydrated] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const [purchaseType, setPurchaseType] = useState<'once' | 'subscription'>('once');
 
-  const addToCart = (product: MremboProduct) => {
-    setCart((prev) => {
-      const existing = prev.find((item) => item.product.id === product.id);
-      if (existing) {
-        return prev.map((item) =>
-          item.product.id === product.id ? { ...item, qty: item.qty + 1 } : item
-        );
-      }
-      return [...prev, { product, qty: 1 }];
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      try {
+        const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '[]') as StoredItem[];
+        setCart(stored.flatMap((item) => {
+          const product = catalogById.get(item.productId);
+          const qty = Math.min(20, Math.max(1, Number(item.qty) || 1));
+          return product ? [{ product, qty }] : [];
+        }));
+      } catch { localStorage.removeItem(STORAGE_KEY); }
+      setHydrated(true);
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    if (hydrated) localStorage.setItem(STORAGE_KEY, JSON.stringify(cart.map(({ product, qty }) => ({ productId: product.id, qty }))));
+  }, [cart, hydrated]);
+
+  const addToCart = (product: CatalogProduct) => {
+    setCart((current) => {
+      const found = current.find((item) => item.product.id === product.id);
+      return found
+        ? current.map((item) => item.product.id === product.id ? { ...item, qty: Math.min(20, item.qty + 1) } : item)
+        : [...current, { product, qty: 1 }];
     });
+    setIsCartOpen(true);
   };
+  const updateQuantity = (productId: string, delta: number) => setCart((current) => current.map((item) => item.product.id === productId ? { ...item, qty: Math.min(20, Math.max(1, item.qty + delta)) } : item));
+  const removeFromCart = (productId: string) => setCart((current) => current.filter((item) => item.product.id !== productId));
+  const clearCart = useCallback(() => setCart([]), []);
+  const value = useMemo(() => ({
+    cart, addToCart, updateQuantity, removeFromCart, clearCart,
+    cartCount: cart.reduce((sum, item) => sum + item.qty, 0),
+    totalPrice: cart.reduce((sum, item) => sum + item.product.priceKsh * item.qty, 0),
+    isCartOpen, hydrated, setIsCartOpen,
+  }), [cart, isCartOpen, hydrated, clearCart]);
 
-  const updateQuantity = (productId: string, delta: number) => {
-    setCart((prev) =>
-      prev.map((item) =>
-        item.product.id === productId
-          ? { ...item, qty: Math.max(1, item.qty + delta) }
-          : item
-      )
-    );
-  };
-
-  const removeFromCart = (productId: string) => {
-    setCart((prev) => prev.filter((item) => item.product.id !== productId));
-  };
-
-  const cartCount = cart.reduce((acc, item) => acc + item.qty, 0);
-  
-  // Apply 10% discount if subscription
-  const rawTotal = cart.reduce((acc, item) => acc + item.product.priceKsh * item.qty, 0);
-  const totalPrice = purchaseType === 'subscription' ? Math.round(rawTotal * 0.9) : rawTotal;
-
-  return (
-    <CartContext.Provider
-      value={{
-        cart,
-        addToCart,
-        updateQuantity,
-        removeFromCart,
-        cartCount,
-        totalPrice,
-        isCartOpen,
-        setIsCartOpen,
-        purchaseType,
-        setPurchaseType,
-      }}
-    >
-      {children}
-    </CartContext.Provider>
-  );
+  return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }
 
 export function useCart() {
-  const context = useContext(CartContext);
-  if (!context) {
-    throw new Error('useCart must be used within a CartProvider');
-  }
-  return context;
+  const value = useContext(CartContext);
+  if (!value) throw new Error('useCart must be used within CartProvider');
+  return value;
 }
